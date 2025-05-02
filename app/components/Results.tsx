@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
 import { calculatePercentiles, getPercentileDescription } from './PercentileCalculator';
 import Recommendations from './Recommendations';
+import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
 
 interface ResultsProps {
   answers: Record<number, string | string[] | number>;
@@ -14,6 +16,13 @@ interface ScoreBreakdown {
 }
 
 const Results: React.FC<ResultsProps> = ({ answers }) => {
+  const { data: session } = useSession();
+  const [saved, setSaved] = useState(false);
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const [error, setError] = useState('');
+
   const calculateIncomeAndBudgetingScore = (): ScoreBreakdown => {
     let score = 0;
     const details: string[] = [];
@@ -373,7 +382,7 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
       <h3 className="text-2xl font-bold text-gray-900 mb-6">How You Compare to Your Peers</h3>
       <div className="space-y-6">
         <div className="text-center">
-          <div className="text-4xl font-bold text-indigo-600 mb-2">
+          <div className="text-4xl font-bold mb-2" style={{ color: '#0058C0' }}>
             {percentileData.finalPercentile}th Percentile
           </div>
           <div className="text-xl text-gray-600">
@@ -389,15 +398,15 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
                   <span className="text-sm font-semibold text-gray-700">Income</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-sm font-semibold text-indigo-600">
+                  <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
                     {percentileData.incomePercentile}th Percentile
                   </span>
                 </div>
               </div>
               <div className="overflow-hidden h-2 bg-gray-200 rounded">
                 <div
-                  className="h-full bg-indigo-600 rounded"
-                  style={{ width: `${percentileData.incomePercentile}%` }}
+                  className="h-full rounded"
+                  style={{ width: `${percentileData.incomePercentile}%`, backgroundColor: '#0058C0' }}
                 />
               </div>
             </div>
@@ -408,15 +417,15 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
                   <span className="text-sm font-semibold text-gray-700">Spending</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-sm font-semibold text-indigo-600">
+                  <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
                     {percentileData.spendingPercentile}th Percentile
                   </span>
                 </div>
               </div>
               <div className="overflow-hidden h-2 bg-gray-200 rounded">
                 <div
-                  className="h-full bg-indigo-600 rounded"
-                  style={{ width: `${percentileData.spendingPercentile}%` }}
+                  className="h-full rounded"
+                  style={{ width: `${percentileData.spendingPercentile}%`, backgroundColor: '#0058C0' }}
                 />
               </div>
             </div>
@@ -427,15 +436,15 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
                   <span className="text-sm font-semibold text-gray-700">Debt Management</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-sm font-semibold text-indigo-600">
+                  <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
                     {percentileData.debtPercentile}th Percentile
                   </span>
                 </div>
               </div>
               <div className="overflow-hidden h-2 bg-gray-200 rounded">
                 <div
-                  className="h-full bg-indigo-600 rounded"
-                  style={{ width: `${percentileData.debtPercentile}%` }}
+                  className="h-full rounded"
+                  style={{ width: `${percentileData.debtPercentile}%`, backgroundColor: '#0058C0' }}
                 />
               </div>
             </div>
@@ -448,15 +457,15 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
                   <span className="text-sm font-semibold text-gray-700">Credit Score</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-sm font-semibold text-indigo-600">
+                  <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
                     {percentileData.creditScorePercentile}th Percentile
                   </span>
                 </div>
               </div>
               <div className="overflow-hidden h-2 bg-gray-200 rounded">
                 <div
-                  className="h-full bg-indigo-600 rounded"
-                  style={{ width: `${percentileData.creditScorePercentile}%` }}
+                  className="h-full rounded"
+                  style={{ width: `${percentileData.creditScorePercentile}%`, backgroundColor: '#0058C0' }}
                 />
               </div>
             </div>
@@ -467,15 +476,15 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
                   <span className="text-sm font-semibold text-gray-700">Savings</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-sm font-semibold text-indigo-600">
+                  <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
                     {percentileData.savingsPercentile}th Percentile
                   </span>
                 </div>
               </div>
               <div className="overflow-hidden h-2 bg-gray-200 rounded">
                 <div
-                  className="h-full bg-indigo-600 rounded"
-                  style={{ width: `${percentileData.savingsPercentile}%` }}
+                  className="h-full rounded"
+                  style={{ width: `${percentileData.savingsPercentile}%`, backgroundColor: '#0058C0' }}
                 />
               </div>
             </div>
@@ -486,15 +495,15 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
                   <span className="text-sm font-semibold text-gray-700">Investments</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-sm font-semibold text-indigo-600">
+                  <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
                     {percentileData.investmentPercentile}th Percentile
                   </span>
                 </div>
               </div>
               <div className="overflow-hidden h-2 bg-gray-200 rounded">
                 <div
-                  className="h-full bg-indigo-600 rounded"
-                  style={{ width: `${percentileData.investmentPercentile}%` }}
+                  className="h-full rounded"
+                  style={{ width: `${percentileData.investmentPercentile}%`, backgroundColor: '#0058C0' }}
                 />
               </div>
             </div>
@@ -503,6 +512,62 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
       </div>
     </motion.div>
   );
+
+  const isSignedIn = session?.user !== undefined;
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError('');
+
+    try {
+      // First, save the quiz results
+      console.log('Saving quiz results...');
+      const saveResponse = await fetch('/api/quiz/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          answers,
+          score: percentage,
+          maxScore,
+          recommendations: breakdowns,
+        }),
+      });
+
+      if (!saveResponse.ok) {
+        const errorData = await saveResponse.json();
+        throw new Error(errorData.error || 'Failed to save results');
+      }
+
+      const { id: quizResultId } = await saveResponse.json();
+      console.log('Quiz results saved with ID:', quizResultId);
+
+      // Then, handle email subscription
+      console.log('Processing email subscription...');
+      const emailResponse = await fetch('/api/email/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          quizResultId,
+        }),
+      });
+
+      if (!emailResponse.ok) {
+        const data = await emailResponse.json();
+        throw new Error(data.error || 'Failed to subscribe email');
+      }
+
+      console.log('Email subscription processed successfully');
+      setEmailSubmitted(true);
+      setSaved(true);
+    } catch (err) {
+      console.error('Error in handleEmailSubmit:', err);
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -513,74 +578,47 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
         className="text-center mb-12"
       >
         <h2 className="text-3xl font-bold text-gray-900 mb-4">
-          Your Financial Health Score
+          Your Financial Health Assessment is Complete!
         </h2>
         
-        <div className="relative inline-block">
-          <svg className="w-48 h-48">
-            <circle
-              className="text-gray-200"
-              strokeWidth="8"
-              stroke="currentColor"
-              fill="transparent"
-              r="70"
-              cx="96"
-              cy="96"
-            />
-            <circle
-              className="text-indigo-600"
-              strokeWidth="8"
-              strokeLinecap="round"
-              stroke="currentColor"
-              fill="transparent"
-              r="70"
-              cx="96"
-              cy="96"
-              strokeDasharray={`${440 * (percentage / 100)} 440`}
-              transform="rotate(-90 96 96)"
-            />
-          </svg>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-            <span className="text-4xl font-bold text-gray-900">{percentage}</span>
-            <span className="text-xl font-semibold text-gray-600">/100</span>
-          </div>
-        </div>
-
-        <details className="mt-8 text-left max-w-2xl mx-auto bg-white rounded-lg shadow-sm">
-          <summary className="px-6 py-4 cursor-pointer hover:bg-gray-50 rounded-lg transition-colors">
-            <span className="font-semibold text-gray-900">View Score Breakdown</span>
-            <span className="text-sm text-gray-500 ml-2">({totalScore}/{maxScore} points)</span>
-          </summary>
-          <div className="px-6 pb-4 space-y-6">
-            {breakdowns.map((breakdown, index) => (
-              <motion.div
-                key={breakdown.section}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-                className="border-t pt-4 first:border-t-0 first:pt-0"
+        {!emailSubmitted ? (
+          <div className="max-w-md mx-auto">
+            <p className="text-lg text-gray-600 mb-6">
+              Enter your email to receive your detailed results and personalized recommendations.
+            </p>
+            <form onSubmit={handleEmailSubmit} className="space-y-4">
+              <div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#0058C0] focus:border-[#0058C0]"
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full px-6 py-3 rounded bg-[#0058C0] text-white font-semibold hover:bg-[#004494] transition disabled:opacity-50"
               >
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {breakdown.section}
-                  </h3>
-                  <span className="text-gray-600">
-                    {breakdown.score}/{breakdown.maxScore}
-                  </span>
-                </div>
-                <ul className="space-y-1 text-sm text-gray-600">
-                  {breakdown.details.map((detail, i) => (
-                    <li key={i}>{detail}</li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
+                {isSubmitting ? 'Sending...' : 'Get My Results'}
+              </button>
+              {error && (
+                <p className="text-red-500 text-sm">{error}</p>
+              )}
+            </form>
+            <p className="mt-4 text-sm text-gray-500">
+              By submitting your email, you agree to receive your results and occasional financial tips.
+            </p>
           </div>
-        </details>
+        ) : (
+          <div className="text-green-600">
+            <p className="text-xl mb-2">✓ Results sent to your email!</p>
+            <p className="text-gray-600">Check your inbox for your detailed financial health assessment.</p>
+          </div>
+        )}
       </motion.div>
-
-      {renderPercentileSection()}
-      <Recommendations answers={answers} />
     </div>
   );
 };

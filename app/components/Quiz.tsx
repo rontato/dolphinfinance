@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Results from './Results';
 import { useInputLogger } from './useInputLogger';
+import React from 'react';
 
 interface QuestionOption {
   value: string;
@@ -453,7 +454,29 @@ export default function Quiz({ onShowResults }: QuizProps) {
   const [sliderValue, setSliderValue] = useState<string | number>(0);
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [otherText, setOtherText] = useState("");
+  const [questionHistory, setQuestionHistory] = useState<number[]>([0]);
   const logInput = useInputLogger('Quiz');
+
+  const handleBack = () => {
+    if (questionHistory.length > 1) {
+      const newHistory = [...questionHistory];
+      newHistory.pop(); // Remove current question
+      const previousQuestion = newHistory[newHistory.length - 1];
+      setCurrentQuestion(previousQuestion);
+      setQuestionHistory(newHistory);
+      
+      // Reset input states for the previous question
+      const prevQuestion = questions[previousQuestion];
+      if (prevQuestion.type === 'text') {
+        setTextInput(String(answers[prevQuestion.id] || ''));
+      } else if (prevQuestion.type === 'slider') {
+        const value = answers[prevQuestion.id];
+        setSliderValue(typeof value === 'number' ? value : 0);
+      } else if (prevQuestion.type === 'multi_select') {
+        setSelectedOptions(Array.isArray(answers[prevQuestion.id]) ? answers[prevQuestion.id] as string[] : []);
+      }
+    }
+  };
 
   const handleAnswer = (value: string | string[] | number) => {
     logInput({
@@ -485,6 +508,7 @@ export default function Quiz({ onShowResults }: QuizProps) {
 
     if (nextQuestionIndex < questions.length) {
       setCurrentQuestion(nextQuestionIndex);
+      setQuestionHistory([...questionHistory, nextQuestionIndex]);
       // Reset input states
       setTextInput("");
       setSliderValue(0);
@@ -512,7 +536,7 @@ export default function Quiz({ onShowResults }: QuizProps) {
                       handleAnswer(option.value);
                     }
                   }}
-                  className={`w-full text-left px-4 py-3 border rounded-lg text-gray-900 font-medium bg-white hover:bg-indigo-50 hover:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm hover:shadow-md ${answers[question.id] === option.value ? 'border-indigo-500' : ''}`}
+                  className={`w-full text-left px-4 py-3 border rounded-lg text-gray-900 font-medium bg-white hover:bg-[#e6f0fa] focus:outline-none focus:ring-2 focus:ring-[#0058C0] transition-all shadow-sm hover:shadow-md ${answers[question.id] === option.value ? 'border-[#0058C0]' : ''}`}
                 >
                   {option.label}
                 </button>
@@ -528,13 +552,22 @@ export default function Quiz({ onShowResults }: QuizProps) {
               </div>
             ))}
             {answers[question.id] === 'other' && (
-              <button
-                onClick={() => handleAnswer(`other:${otherText}`)}
-                className="w-full mt-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-                disabled={!otherText.trim()}
-              >
-                Next
-              </button>
+              <div className="flex space-x-4">
+                <button
+                  onClick={handleBack}
+                  className="w-1/4 px-3 py-1.5 bg-gray-200 text-[#0058C0] rounded-md hover:bg-gray-300"
+                  disabled={questionHistory.length <= 1}
+                >
+                  Back
+                </button>
+                <button
+                  onClick={() => handleAnswer(`other:${otherText}`)}
+                  className="w-3/4 px-4 py-2 bg-[#0058C0] text-white rounded-md hover:bg-[#004494]"
+                  disabled={!otherText.trim()}
+                >
+                  Next
+                </button>
+              </div>
             )}
           </div>
         );
@@ -562,7 +595,7 @@ export default function Quiz({ onShowResults }: QuizProps) {
                   setSliderValue(val);
                   setAnswers(prev => ({ ...prev, [question.id]: val }));
                 }}
-                className="w-32 px-2 py-1 border rounded-md text-right font-semibold text-black"
+                className="w-32 px-2 py-1 border border-[#0058C0] rounded-md text-right font-semibold text-[#0058C0] bg-white placeholder-[#0058C0]"
               />
               <input
                 type="range"
@@ -575,10 +608,11 @@ export default function Quiz({ onShowResults }: QuizProps) {
                   setSliderValue(val);
                   setAnswers(prev => ({ ...prev, [question.id]: val }));
                 }}
-                className="w-full"
+                className="w-full slider-blue"
+                style={{ accentColor: '#0058C0' }}
               />
             </div>
-            <div className="text-center text-lg font-semibold text-gray-700">
+            <div className="text-center text-lg font-semibold text-[#0058C0]">
               {question.prefix || ''}
               {(() => {
                 const val = answers[question.id];
@@ -589,15 +623,24 @@ export default function Quiz({ onShowResults }: QuizProps) {
                 }
               })()}
             </div>
-            <button
-              onClick={() => handleAnswer(typeof answers[question.id] === 'number' ? answers[question.id] : sliderValue)}
-              className="w-full mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-            >
-              Next
-            </button>
+            <div className="flex space-x-4">
+              <button
+                onClick={handleBack}
+                className="w-1/4 px-3 py-1.5 bg-gray-200 text-[#0058C0] rounded-md hover:bg-gray-300"
+                disabled={questionHistory.length <= 1}
+              >
+                Back
+              </button>
+              <button
+                onClick={() => handleAnswer(typeof answers[question.id] === 'number' ? answers[question.id] : sliderValue)}
+                className="w-3/4 px-4 py-2 bg-[#0058C0] text-white rounded-md hover:bg-[#004494]"
+              >
+                Next
+              </button>
+            </div>
             <button
               onClick={() => handleAnswer('not_sure')}
-              className="w-full mt-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+              className="w-full mt-2 px-4 py-2 bg-gray-200 text-[#0058C0] rounded-md hover:bg-gray-300"
             >
               I'm not sure
             </button>
@@ -614,7 +657,7 @@ export default function Quiz({ onShowResults }: QuizProps) {
                 logInput(e);
                 setTextInput(e.target.value);
               }}
-              className="w-full px-3 py-2 border rounded-md text-gray-900 font-medium bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder:text-gray-400"
+              className="w-full px-3 py-2 border rounded-md text-gray-900 font-medium bg-white focus:ring-2 focus:ring-[#0058C0] focus:border-[#0058C0] placeholder:text-gray-400"
               placeholder={question.id === 3.5 ? "Enter your age (18-100)" : "Enter your answer"}
               min={question.id === 3.5 ? 18 : undefined}
               max={question.id === 3.5 ? 100 : undefined}
@@ -628,23 +671,32 @@ export default function Quiz({ onShowResults }: QuizProps) {
                   {formatNumberWithCommas(textInput)}
                 </div>
             )}
-            <button
-              onClick={() => {
-                if (question.id === 3.5) {
-                  const age = Number(textInput);
-                  if (isNaN(age) || age < 18 || age > 100) {
-                    alert("Please enter a valid age between 18 and 100");
-                    return;
+            <div className="flex space-x-4">
+              <button
+                onClick={handleBack}
+                className="w-1/4 px-3 py-1.5 bg-gray-200 text-[#0058C0] rounded-md hover:bg-gray-300"
+                disabled={questionHistory.length <= 1}
+              >
+                Back
+              </button>
+              <button
+                onClick={() => {
+                  if (question.id === 3.5) {
+                    const age = Number(textInput);
+                    if (isNaN(age) || age < 18 || age > 100) {
+                      alert("Please enter a valid age between 18 and 100");
+                      return;
+                    }
+                    handleAnswer(age);
+                  } else {
+                    handleAnswer(textInput);
                   }
-                  handleAnswer(age);
-                } else {
-                  handleAnswer(textInput);
-                }
-              }}
-              className="w-full mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-            >
-              Continue
-            </button>
+                }}
+                className="w-3/4 px-4 py-2 bg-[#0058C0] text-white rounded-md hover:bg-[#004494]"
+              >
+                Next
+              </button>
+            </div>
           </div>
         );
 
@@ -662,8 +714,8 @@ export default function Quiz({ onShowResults }: QuizProps) {
                   }}
                   className={`w-full text-left px-4 py-3 border rounded-lg text-gray-900 font-medium transition-all shadow-sm hover:shadow-md ${
                     selectedOptions.includes(option.value)
-                      ? 'bg-indigo-100 border-indigo-500 shadow-md'
-                      : 'bg-white hover:bg-indigo-50 hover:border-indigo-300'
+                      ? 'bg-[#e6f0fa] border-[#0058C0] shadow-md'
+                      : 'bg-white hover:bg-[#e6f0fa]'
                   }`}
                 >
                   {option.label}
@@ -679,18 +731,27 @@ export default function Quiz({ onShowResults }: QuizProps) {
                 )}
               </div>
             ))}
-            <button
-              onClick={() => {
-                let answer = selectedOptions.includes('other')
-                  ? selectedOptions.filter(v => v !== 'other').concat(otherText ? [`other:${otherText}`] : [])
-                  : selectedOptions;
-                handleAnswer(answer);
-              }}
-              className="w-full mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-              disabled={selectedOptions.includes('other') && !otherText.trim()}
-            >
-              Continue
-            </button>
+            <div className="flex space-x-4">
+              <button
+                onClick={handleBack}
+                className="w-1/4 px-3 py-1.5 bg-gray-200 text-[#0058C0] rounded-md hover:bg-gray-300"
+                disabled={questionHistory.length <= 1}
+              >
+                Back
+              </button>
+              <button
+                onClick={() => {
+                  let answer = selectedOptions.includes('other')
+                    ? selectedOptions.filter(v => v !== 'other').concat(otherText ? [`other:${otherText}`] : [])
+                    : selectedOptions;
+                  handleAnswer(answer);
+                }}
+                className="w-3/4 px-4 py-2 bg-[#0058C0] text-white rounded-md hover:bg-[#004494]"
+                disabled={selectedOptions.includes('other') && !otherText.trim()}
+              >
+                Next
+              </button>
+            </div>
           </div>
         );
     }
@@ -698,15 +759,21 @@ export default function Quiz({ onShowResults }: QuizProps) {
 
   const progressPercentage = ((currentQuestion) / questions.length) * 100;
 
+  // Call onShowResults only after isComplete becomes true, not during render
+  useEffect(() => {
+    if (isComplete && onShowResults) {
+      onShowResults();
+    }
+  }, [isComplete, onShowResults]);
+
   if (isComplete) {
-    if (onShowResults) onShowResults();
     return <Results answers={answers} />;
   }
 
   return (
     <div className="max-w-2xl mx-auto">
       {/* Section title */}
-      <h2 className="text-xl font-semibold text-gray-700 mb-4">
+      <h2 className="text-xl font-semibold mb-4" style={{ color: '#000' }}>
         {questions[currentQuestion].section}
       </h2>
 
@@ -727,7 +794,7 @@ export default function Quiz({ onShowResults }: QuizProps) {
           transition={{ duration: 0.3 }}
         >
           <div className="bg-white rounded-lg p-6 shadow-lg">
-            <h3 className="text-xl font-semibold text-gray-900 mb-6">
+            <h3 className="text-xl font-semibold mb-6" style={{ color: '#000' }}>
               {questions[currentQuestion].text}
             </h3>
             {renderQuestion()}

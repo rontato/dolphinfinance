@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String?
+  name      String?
+  image     String?
+  createdAt DateTime @default(now())
+  results   QuizResult[]
+  emailSubscriptions EmailSubscription[]
+}
+
+model QuizResult {
+  id           Int      @id @default(autoincrement())
+  user         User?    @relation(fields: [userId], references: [id])
+  userId       Int?
+  answers      Json
+  score        Int
+  maxScore     Int
+  recommendations Json
+  createdAt    DateTime @default(now())
+  emailSubscription EmailSubscription?
+}
+
+model EmailSubscription {
+  id          Int      @id @default(autoincrement())
+  email       String
+  createdAt   DateTime @default(now())
+  user        User?    @relation(fields: [userId], references: [id])
+  userId      Int?
+  quizResult  QuizResult? @relation(fields: [quizResultId], references: [id])
+  quizResultId Int?    @unique
+  status      String   @default("active") // active, unsubscribed, bounced
+}
+
+model EmailTemplate {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  subject     String
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

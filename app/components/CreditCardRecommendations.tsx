@@ -101,7 +101,7 @@ export default function CreditCardRecommendations({ creditScore, monthlyIncome }
               href={card.affiliateLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full bg-blue-600 text-white text-center py-3 rounded-lg hover:bg-blue-700 transition-colors"
+              className="block w-full bg-[#0058C0] text-white text-center py-3 rounded-lg hover:bg-[#004494] transition-colors"
             >
               Apply Now
             </a>

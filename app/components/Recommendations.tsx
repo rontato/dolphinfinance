@@ -359,7 +359,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({ answers }) => {
                       href={product.applicationLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-block px-4 py-2 rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
+                      className="inline-block px-4 py-2 rounded-md text-white bg-[#0058C0] hover:bg-[#004494] transition-colors"
                     >
                       Learn More
                     </a>
