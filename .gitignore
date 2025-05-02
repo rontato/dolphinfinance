@@ -1,0 +1,19 @@
+ # Node dependencies
+node_modules/
+.next/swc-darwin-arm64/
+**/*.node
+
+# Build output
+.next/
+
+# OS generated files
+.DS_Store
+
+# Environment variables
+.env
+
+# Prisma local database
+prisma/dev.db
+
+# Generated Prisma client
+app/generated/
