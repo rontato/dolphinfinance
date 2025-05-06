@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
 import { calculatePercentiles, getPercentileDescription } from './PercentileCalculator';
 import Recommendations from './Recommendations';
-import { useSession } from 'next-auth/react';
+import { useSession, signIn } from 'next-auth/react';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 interface ResultsProps {
   answers: Record<number, string | string[] | number>;
@@ -18,10 +19,13 @@ interface ScoreBreakdown {
 const Results: React.FC<ResultsProps> = ({ answers }) => {
   const { data: session } = useSession();
   const [saved, setSaved] = useState(false);
-  const [email, setEmail] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [emailSubmitted, setEmailSubmitted] = useState(false);
-  const [error, setError] = useState('');
+  const [scoreBreakdownOpen, setScoreBreakdownOpen] = useState(false);
+  const [signingIn, setSigningIn] = useState(false);
+  const [error, setError] = useState("");
+  // Comment out email-related state
+  // const [email, setEmail] = useState('');
+  // const [isSubmitting, setIsSubmitting] = useState(false);
+  // const [emailSubmitted, setEmailSubmitted] = useState(false);
 
   const calculateIncomeAndBudgetingScore = (): ScoreBreakdown => {
     let score = 0;
@@ -169,7 +173,7 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
     }
 
     return {
-      section: "Debt Consideration",
+      section: "Debt Management",
       score,
       maxScore: 20,
       details
@@ -214,7 +218,7 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
     }
 
     return {
-      section: "Debt & Credit Health",
+      section: "Credit Score",
       score,
       maxScore: 15,
       details
@@ -246,7 +250,6 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
     }
 
     // Investment Amount (5 points)
-    // Note: Age-based comparison would need to be implemented
     const investmentAmount = Number(answers[28]) || 0;
     if (investmentAmount > 0) {
       score += 5;
@@ -256,7 +259,7 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
     }
 
     return {
-      section: "Investing Knowledge & Habits",
+      section: "Investing",
       score,
       maxScore: 15,
       details
@@ -288,14 +291,13 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
     const k401Amount = Number(answers[35]) || 0;
     const totalRetirement = rothAmount + k401Amount;
 
-    // Note: This would need to be adjusted based on age
-    if (totalRetirement >= 100000) {
+    if (totalRetirement >= 25000) {
       score += 10;
       details.push('✓ Excellent retirement savings (+10 points)');
-    } else if (totalRetirement >= 75000) {
+    } else if (totalRetirement >= 17500) {
       score += 7;
       details.push('✓ Good retirement savings (+7 points)');
-    } else if (totalRetirement >= 50000) {
+    } else if (totalRetirement >= 10000) {
       score += 5;
       details.push('⚠ Moderate retirement savings (+5 points)');
     } else if (totalRetirement > 0) {
@@ -306,7 +308,7 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
     }
 
     return {
-      section: "Long-Term Savings & Retirement",
+      section: "Retirement",
       score,
       maxScore: 20,
       details
@@ -337,6 +339,8 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
 
   const { totalScore, maxScore, percentage, breakdowns } = calculateTotalScore();
 
+  // --- Percentile Breakdown Feature (Commented Out) ---
+  /*
   const calculatePercentileInputs = () => {
     // Calculate total debt
     const studentLoanDebt = Number(answers[14]) || 0;
@@ -512,18 +516,18 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
       </div>
     </motion.div>
   );
+  */
+  // --- End Percentile Breakdown Feature ---
 
-  const isSignedIn = session?.user !== undefined;
-
-  const handleEmailSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError('');
-
-    try {
-      // First, save the quiz results
-      console.log('Saving quiz results...');
-      const saveResponse = await fetch('/api/quiz/save', {
+  // Save results to user profile after sign in
+  useEffect(() => {
+    if (session && !saved) {
+      // Save quiz results to user profile
+      const saveResults = async () => {
+        try {
+          setSigningIn(true);
+          setError("");
+          const res = await fetch('/api/quiz/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -533,41 +537,20 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
           recommendations: breakdowns,
         }),
       });
-
-      if (!saveResponse.ok) {
-        const errorData = await saveResponse.json();
-        throw new Error(errorData.error || 'Failed to save results');
-      }
-
-      const { id: quizResultId } = await saveResponse.json();
-      console.log('Quiz results saved with ID:', quizResultId);
-
-      // Then, handle email subscription
-      console.log('Processing email subscription...');
-      const emailResponse = await fetch('/api/email/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          quizResultId,
-        }),
-      });
-
-      if (!emailResponse.ok) {
-        const data = await emailResponse.json();
-        throw new Error(data.error || 'Failed to subscribe email');
-      }
-
-      console.log('Email subscription processed successfully');
-      setEmailSubmitted(true);
+          if (!res.ok) {
+            const data = await res.json();
+            throw new Error(data.error || 'Failed to save results');
+          }
       setSaved(true);
-    } catch (err) {
-      console.error('Error in handleEmailSubmit:', err);
-      setError(err instanceof Error ? err.message : 'An error occurred');
+        } catch (err: any) {
+          setError(err.message || 'Failed to save results');
     } finally {
-      setIsSubmitting(false);
+          setSigningIn(false);
     }
   };
+      saveResults();
+    }
+  }, [session]);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -578,44 +561,246 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
         className="text-center mb-12"
       >
         <h2 className="text-3xl font-bold text-gray-900 mb-4">
-          Your Financial Health Assessment is Complete!
+          Your Financial Health Assessment Results
         </h2>
         
-        {!emailSubmitted ? (
-          <div className="max-w-md mx-auto">
-            <p className="text-lg text-gray-600 mb-6">
-              Enter your email to receive your detailed results and personalized recommendations.
-            </p>
-            <form onSubmit={handleEmailSubmit} className="space-y-4">
-              <div>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#0058C0] focus:border-[#0058C0]"
-                  required
+        {/* Financial Health Score */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <h3 className="text-2xl font-semibold text-[#0058C0] mb-4">Financial Health Score</h3>
+          <div className="flex flex-col items-center justify-center">
+            <div className="relative w-40 h-40 mb-4">
+              <svg className="w-full h-full" viewBox="0 0 100 100">
+                {/* Background circle */}
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="45"
+                  fill="none"
+                  stroke="#e9ecef"
+                  strokeWidth="10"
                 />
+                {/* Progress circle */}
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="45"
+                  fill="none"
+                  stroke="#0058C0"
+                  strokeWidth="10"
+                  strokeDasharray={`${percentage * 2.83}, 283`}
+                  strokeLinecap="round"
+                  transform="rotate(-90 50 50)"
+                  style={{ transition: 'stroke-dasharray 1s ease' }}
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-4xl font-bold text-gray-900">{percentage}%</span>
               </div>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full px-6 py-3 rounded bg-[#0058C0] text-white font-semibold hover:bg-[#004494] transition disabled:opacity-50"
-              >
-                {isSubmitting ? 'Sending...' : 'Get My Results'}
-              </button>
-              {error && (
-                <p className="text-red-500 text-sm">{error}</p>
-              )}
-            </form>
-            <p className="mt-4 text-sm text-gray-500">
-              By submitting your email, you agree to receive your results and occasional financial tips.
-            </p>
+            </div>
           </div>
-        ) : (
-          <div className="text-green-600">
-            <p className="text-xl mb-2">✓ Results sent to your email!</p>
-            <p className="text-gray-600">Check your inbox for your detailed financial health assessment.</p>
+        </div>
+
+        {/* Percentile Comparison (Commented Out) */}
+        {/**
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <h3 className="text-2xl font-semibold text-[#0058C0] mb-4">How You Compare to Your Peers</h3>
+          <div className="space-y-6">
+            <div className="text-center">
+              <div className="text-4xl font-bold mb-2" style={{ color: '#0058C0' }}>
+                {percentileData.finalPercentile}th Percentile
+              </div>
+              <div className="text-xl text-gray-600">
+                {getPercentileDescription(percentileData.finalPercentile)}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4">
+                <div className="relative pt-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <span className="text-sm font-semibold text-gray-700">Income</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
+                        {percentileData.incomePercentile}th Percentile
+                      </span>
+                    </div>
+                  </div>
+                  <div className="overflow-hidden h-2 bg-gray-200 rounded">
+                    <div
+                      className="h-full rounded"
+                      style={{ width: `${percentileData.incomePercentile}%`, backgroundColor: '#0058C0' }}
+                    />
+                  </div>
+                </div>
+
+                <div className="relative pt-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <span className="text-sm font-semibold text-gray-700">Spending</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
+                        {percentileData.spendingPercentile}th Percentile
+                      </span>
+                    </div>
+                  </div>
+                  <div className="overflow-hidden h-2 bg-gray-200 rounded">
+                    <div
+                      className="h-full rounded"
+                      style={{ width: `${percentileData.spendingPercentile}%`, backgroundColor: '#0058C0' }}
+                    />
+                  </div>
+                </div>
+
+                <div className="relative pt-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <span className="text-sm font-semibold text-gray-700">Debt Management</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
+                        {percentileData.debtPercentile}th Percentile
+                      </span>
+                    </div>
+                  </div>
+                  <div className="overflow-hidden h-2 bg-gray-200 rounded">
+                    <div
+                      className="h-full rounded"
+                      style={{ width: `${percentileData.debtPercentile}%`, backgroundColor: '#0058C0' }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="relative pt-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <span className="text-sm font-semibold text-gray-700">Credit Score</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
+                        {percentileData.creditScorePercentile}th Percentile
+                      </span>
+                    </div>
+                  </div>
+                  <div className="overflow-hidden h-2 bg-gray-200 rounded">
+                    <div
+                      className="h-full rounded"
+                      style={{ width: `${percentileData.creditScorePercentile}%`, backgroundColor: '#0058C0' }}
+                    />
+                  </div>
+                </div>
+
+                <div className="relative pt-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <span className="text-sm font-semibold text-gray-700">Savings</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
+                        {percentileData.savingsPercentile}th Percentile
+                      </span>
+                    </div>
+                  </div>
+                  <div className="overflow-hidden h-2 bg-gray-200 rounded">
+                    <div
+                      className="h-full rounded"
+                      style={{ width: `${percentileData.savingsPercentile}%`, backgroundColor: '#0058C0' }}
+                    />
+                  </div>
+                </div>
+
+                <div className="relative pt-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <span className="text-sm font-semibold text-gray-700">Investments</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
+                        {percentileData.investmentPercentile}th Percentile
+                      </span>
+                    </div>
+                  </div>
+                  <div className="overflow-hidden h-2 bg-gray-200 rounded">
+                    <div
+                      className="h-full rounded"
+                      style={{ width: `${percentileData.investmentPercentile}%`, backgroundColor: '#0058C0' }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        */}
+
+        {/* Score Breakdown (Dropdown) */}
+        <div className="bg-white rounded-lg shadow-sm p-4 mb-8">
+              <button
+            className="flex items-center justify-between w-full text-xl font-semibold text-[#0058C0] mb-2 focus:outline-none"
+            onClick={() => setScoreBreakdownOpen((open) => !open)}
+            aria-expanded={scoreBreakdownOpen}
+          >
+            <span>Score Breakdown</span>
+            <svg
+              className={`w-6 h-6 ml-2 transition-transform ${scoreBreakdownOpen ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+              </button>
+          {scoreBreakdownOpen && (
+            <div className="space-y-3">
+              {breakdowns.map((rec) => (
+                <div key={rec.section} className="bg-gray-50 rounded-md p-3">
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="text-base font-semibold text-[#0058C0]">{rec.section}</h4>
+                    <span className="text-gray-900 font-semibold text-sm">{rec.score}/{rec.maxScore}</span>
+                  </div>
+                  <div className="bg-gray-200 h-1.5 rounded-full overflow-hidden">
+                    <div
+                      className="bg-[#0058C0] h-full"
+                      style={{ width: `${(rec.score / rec.maxScore) * 100}%` }}
+                    />
+                  </div>
+                  <ul className="mt-2 space-y-1">
+                    {rec.details.map((detail, index) => (
+                      <li key={index} className="text-gray-600 text-sm">{detail}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
+          </div>
+
+        {/* Product Recommendations */}
+        <Recommendations answers={answers} />
+
+        {/* Call to Action */}
+        {!session && (
+          <div className="bg-[#e6f0fa] rounded-lg p-6 text-center">
+            <h3 className="text-xl font-semibold text-[#0058C0] mb-2">Save Your Results</h3>
+            <p className="text-gray-600 mb-4">Create an account to save your results and track your financial health over time.</p>
+            <button
+              onClick={async () => {
+                setSigningIn(true);
+                setError("");
+                await signIn(undefined, { callbackUrl: window.location.href });
+                // After sign in, useEffect will save results
+              }}
+              className="inline-block bg-[#0058C0] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#004494] transition"
+              disabled={signingIn}
+            >
+              {signingIn ? 'Signing In...' : 'Sign In / Create Account'}
+            </button>
+            {error && <div className="text-red-500 mt-2">{error}</div>}
           </div>
         )}
       </motion.div>

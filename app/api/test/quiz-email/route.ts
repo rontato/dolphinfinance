@@ -1,3 +1,4 @@
+/*
 import { NextResponse } from 'next/server';
 import sgMail from '@sendgrid/mail';
 
@@ -129,9 +130,14 @@ export async function GET() {
           <h3 style="color: #0058C0;">Your Score Breakdown:</h3>
           ${sampleResults.recommendations.map(rec => `
             <div style="margin-bottom: 15px; padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
-              <h4 style="margin: 0 0 10px 0; color: #0058C0;">${rec.section}</h4>
-              <p style="margin: 0 0 10px 0;">Score: ${rec.score}/${rec.maxScore}</p>
-              <ul style="margin: 0; padding-left: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h4 style="margin: 0; color: #0058C0;">${rec.section}</h4>
+                <span style="font-weight: 600;">${rec.score}/${rec.maxScore}</span>
+              </div>
+              <div style="background-color: #e9ecef; height: 8px; border-radius: 4px; margin: 10px 0;">
+                <div style="background-color: #0058C0; width: ${(rec.score/rec.maxScore)*100}%; height: 100%; border-radius: 4px;"></div>
+              </div>
+              <ul style="margin: 10px 0 0 0; padding-left: 20px;">
                 ${rec.details.map(detail => `<li style="margin-bottom: 5px;">${detail}</li>`).join('')}
               </ul>
             </div>
@@ -174,4 +180,5 @@ export async function GET() {
       details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
   }
-} 
+}
+*/ 

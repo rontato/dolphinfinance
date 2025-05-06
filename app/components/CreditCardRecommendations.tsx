@@ -30,7 +30,7 @@ const creditCards: CreditCard[] = [
       'Additional bonus categories',
     ],
     affiliateLink: 'https://www.chase.com/referafriend/freedomunlimited',
-    score: 690,
+    score: 670,
   },
   {
     name: 'Discover it® Cash Back',
@@ -44,7 +44,7 @@ const creditCards: CreditCard[] = [
       'Free FICO® Score monitoring',
     ],
     affiliateLink: 'https://www.discover.com/credit-cards/cash-back/it-card.html',
-    score: 670,
+    score: 600,
   },
   {
     name: 'American Express® Gold Card',
@@ -59,7 +59,7 @@ const creditCards: CreditCard[] = [
       'No foreign transaction fees',
     ],
     affiliateLink: 'https://www.americanexpress.com/us/credit-cards/card/gold-card/',
-    score: 700,
+    score: 680,
   },
 ];
 

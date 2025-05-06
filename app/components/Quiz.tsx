@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Results from './Results';
 import { useInputLogger } from './useInputLogger';
 import React from 'react';
+import BankSelector from './BankSelector';
+import { submitQuizData } from '../lib/submitQuizData';
 
 interface QuestionOption {
   value: string;
@@ -41,7 +43,11 @@ interface MultiSelectQuestion extends BaseQuestion {
   options: QuestionOption[];
 }
 
-type Question = MultipleChoiceQuestion | SliderQuestion | TextQuestion | MultiSelectQuestion;
+interface BankQuestion extends BaseQuestion {
+  type: "bank";
+}
+
+type Question = MultipleChoiceQuestion | SliderQuestion | TextQuestion | MultiSelectQuestion | BankQuestion;
 
 const questions: Question[] = [
   // Section 1: Income & Budgeting
@@ -104,7 +110,7 @@ const questions: Question[] = [
     id: 5,
     section: "🏦 Section 2: Banking & Accounts",
     text: "Which bank is your checking account with?",
-    type: "text",
+    type: "bank",
     condition: { questionId: 4, expectedValue: "yes" }
   },
   {
@@ -133,7 +139,7 @@ const questions: Question[] = [
     id: 8,
     section: "🏦 Section 2: Banking & Accounts",
     text: "Which bank is your savings account with?",
-    type: "text",
+    type: "bank",
     condition: { questionId: 7, expectedValue: "yes" }
   },
   {
@@ -162,7 +168,7 @@ const questions: Question[] = [
     id: 11,
     section: "🏦 Section 2: Banking & Accounts",
     text: "Which bank is your high-yield savings account with?",
-    type: "text",
+    type: "bank",
     condition: { questionId: 10, expectedValue: "yes" }
   },
   {
@@ -456,6 +462,7 @@ export default function Quiz({ onShowResults }: QuizProps) {
   const [otherText, setOtherText] = useState("");
   const [questionHistory, setQuestionHistory] = useState<number[]>([0]);
   const logInput = useInputLogger('Quiz');
+  const [hasSavedToFirestore, setHasSavedToFirestore] = useState(false);
 
   const handleBack = () => {
     if (questionHistory.length > 1) {
@@ -521,6 +528,34 @@ export default function Quiz({ onShowResults }: QuizProps) {
   const renderQuestion = () => {
     const question = questions[currentQuestion];
 
+    const renderBackButton = () => (
+      <button
+        onClick={handleBack}
+        className="w-1/4 px-3 py-1.5 bg-gray-200 text-[#0058C0] rounded-md hover:bg-gray-300"
+        disabled={questionHistory.length <= 1}
+        style={{ visibility: currentQuestion === 0 ? 'hidden' : 'visible' }}
+      >
+        Back
+      </button>
+    );
+
+    const renderNextButton = (onClick: () => void, disabled = false) => (
+      <button
+        onClick={onClick}
+        className="w-3/4 px-4 py-2 bg-[#0058C0] text-white rounded-md hover:bg-[#004494]"
+        disabled={disabled}
+      >
+        Next
+      </button>
+    );
+
+    const renderNavigationButtons = (onNext: () => void, disabled = false) => (
+      <div className="flex space-x-4 mt-4">
+        {renderBackButton()}
+        {renderNextButton(onNext, disabled)}
+      </div>
+    );
+
     switch (question.type) {
       case 'multiple_choice':
         return (
@@ -530,7 +565,6 @@ export default function Quiz({ onShowResults }: QuizProps) {
                 <button
                   onClick={() => {
                     if (option.value === 'other') {
-                      // Do not auto-advance, show text input
                       setAnswers(prev => ({ ...prev, [question.id]: 'other' }));
                     } else {
                       handleAnswer(option.value);
@@ -551,22 +585,12 @@ export default function Quiz({ onShowResults }: QuizProps) {
                 )}
               </div>
             ))}
-            {answers[question.id] === 'other' && (
-              <div className="flex space-x-4">
-                <button
-                  onClick={handleBack}
-                  className="w-1/4 px-3 py-1.5 bg-gray-200 text-[#0058C0] rounded-md hover:bg-gray-300"
-                  disabled={questionHistory.length <= 1}
-                >
-                  Back
-                </button>
-                <button
-                  onClick={() => handleAnswer(`other:${otherText}`)}
-                  className="w-3/4 px-4 py-2 bg-[#0058C0] text-white rounded-md hover:bg-[#004494]"
-                  disabled={!otherText.trim()}
-                >
-                  Next
-                </button>
+            {/* Only show navigation for 'other' option, otherwise just Back button */}
+            {answers[question.id] === 'other' ? (
+              renderNavigationButtons(() => handleAnswer(`other:${otherText}`), !otherText.trim())
+            ) : (
+              <div className="flex mt-4">
+                {currentQuestion !== 0 && renderBackButton()}
               </div>
             )}
           </div>
@@ -623,21 +647,9 @@ export default function Quiz({ onShowResults }: QuizProps) {
                 }
               })()}
             </div>
-            <div className="flex space-x-4">
-              <button
-                onClick={handleBack}
-                className="w-1/4 px-3 py-1.5 bg-gray-200 text-[#0058C0] rounded-md hover:bg-gray-300"
-                disabled={questionHistory.length <= 1}
-              >
-                Back
-              </button>
-              <button
-                onClick={() => handleAnswer(typeof answers[question.id] === 'number' ? answers[question.id] : sliderValue)}
-                className="w-3/4 px-4 py-2 bg-[#0058C0] text-white rounded-md hover:bg-[#004494]"
-              >
-                Next
-              </button>
-            </div>
+            {renderNavigationButtons(
+              () => handleAnswer(typeof answers[question.id] === 'number' ? answers[question.id] : sliderValue)
+            )}
             <button
               onClick={() => handleAnswer('not_sure')}
               className="w-full mt-2 px-4 py-2 bg-gray-200 text-[#0058C0] rounded-md hover:bg-gray-300"
@@ -671,32 +683,20 @@ export default function Quiz({ onShowResults }: QuizProps) {
                   {formatNumberWithCommas(textInput)}
                 </div>
             )}
-            <div className="flex space-x-4">
-              <button
-                onClick={handleBack}
-                className="w-1/4 px-3 py-1.5 bg-gray-200 text-[#0058C0] rounded-md hover:bg-gray-300"
-                disabled={questionHistory.length <= 1}
-              >
-                Back
-              </button>
-              <button
-                onClick={() => {
-                  if (question.id === 3.5) {
-                    const age = Number(textInput);
-                    if (isNaN(age) || age < 18 || age > 100) {
-                      alert("Please enter a valid age between 18 and 100");
-                      return;
-                    }
-                    handleAnswer(age);
-                  } else {
-                    handleAnswer(textInput);
+            {renderNavigationButtons(
+              () => {
+                if (question.id === 3.5) {
+                  const age = Number(textInput);
+                  if (isNaN(age) || age < 18 || age > 100) {
+                    alert("Please enter a valid age between 18 and 100");
+                    return;
                   }
-                }}
-                className="w-3/4 px-4 py-2 bg-[#0058C0] text-white rounded-md hover:bg-[#004494]"
-              >
-                Next
-              </button>
-            </div>
+                  handleAnswer(age);
+                } else {
+                  handleAnswer(textInput);
+                }
+              }
+            )}
           </div>
         );
 
@@ -731,29 +731,35 @@ export default function Quiz({ onShowResults }: QuizProps) {
                 )}
               </div>
             ))}
-            <div className="flex space-x-4">
-              <button
-                onClick={handleBack}
-                className="w-1/4 px-3 py-1.5 bg-gray-200 text-[#0058C0] rounded-md hover:bg-gray-300"
-                disabled={questionHistory.length <= 1}
-              >
-                Back
-              </button>
-              <button
-                onClick={() => {
-                  let answer = selectedOptions.includes('other')
-                    ? selectedOptions.filter(v => v !== 'other').concat(otherText ? [`other:${otherText}`] : [])
-                    : selectedOptions;
-                  handleAnswer(answer);
-                }}
-                className="w-3/4 px-4 py-2 bg-[#0058C0] text-white rounded-md hover:bg-[#004494]"
-                disabled={selectedOptions.includes('other') && !otherText.trim()}
-              >
-                Next
-              </button>
-            </div>
+            {renderNavigationButtons(
+              () => {
+                let answer = selectedOptions.includes('other')
+                  ? selectedOptions.filter(v => v !== 'other').concat(otherText ? [`other:${otherText}`] : [])
+                  : selectedOptions;
+                handleAnswer(answer);
+              },
+              selectedOptions.includes('other') && !otherText.trim()
+            )}
           </div>
         );
+
+      case 'bank':
+        return (
+          <div className="space-y-4">
+            <BankSelector
+              value={answers[question.id] as string || ""}
+              onChange={handleAnswer}
+              placeholder="Select your bank"
+            />
+            {renderNavigationButtons(
+              () => handleAnswer(answers[question.id] || ""),
+              !answers[question.id]
+            )}
+          </div>
+        );
+
+      default:
+        return null;
     }
   };
 
@@ -761,10 +767,17 @@ export default function Quiz({ onShowResults }: QuizProps) {
 
   // Call onShowResults only after isComplete becomes true, not during render
   useEffect(() => {
-    if (isComplete && onShowResults) {
-      onShowResults();
+    if (isComplete && !hasSavedToFirestore) {
+      // Save quiz data to Firestore
+      submitQuizData({
+        answers,
+        completedAt: new Date().toISOString(),
+      }).then(() => setHasSavedToFirestore(true));
+      if (onShowResults) {
+        onShowResults();
+      }
     }
-  }, [isComplete, onShowResults]);
+  }, [isComplete, hasSavedToFirestore, answers, onShowResults]);
 
   if (isComplete) {
     return <Results answers={answers} />;
@@ -780,8 +793,8 @@ export default function Quiz({ onShowResults }: QuizProps) {
       {/* Progress bar */}
       <div className="w-full bg-gray-200 rounded-full h-2.5 mb-6">
         <div
-          className="bg-indigo-600 h-2.5 rounded-full transition-all duration-300 ease-in-out"
-          style={{ width: `${progressPercentage}%` }}
+          className="h-2.5 rounded-full transition-all duration-300 ease-in-out"
+          style={{ width: `${progressPercentage}%`, backgroundColor: '#0058C0' }}
         />
       </div>
 
