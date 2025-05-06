@@ -1,6 +1,7 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 
@@ -21,7 +22,7 @@ export default function Header() {
     <header className="w-full bg-white shadow flex items-center justify-between px-6 py-3">
       <div className="flex items-center space-x-2">
         <Link href="/" onClick={() => { window.location.href = '/'; }}>
-          <img src="/assets/Logo + Logo Text.png" alt="Logo" width={160} height={40} style={{ objectFit: 'contain' }} />
+          <Image src="/assets/Logo + Logo Text.png" alt="Logo" width={160} height={40} style={{ objectFit: 'contain' }} />
         </Link>
       </div>
       <div className="flex items-center space-x-4">
@@ -40,7 +41,7 @@ export default function Header() {
             )}
             <div className="relative">
               <button onClick={() => setDropdownOpen(v => !v)} className="focus:outline-none">
-                <img src={(session.user as any)?.image ?? "https://cdn-icons-png.flaticon.com/512/149/149071.png"} alt="Profile" width={36} height={36} className="rounded-full" />
+                <Image src={(session.user as { image?: string })?.image ?? "https://cdn-icons-png.flaticon.com/512/149/149071.png"} alt="Profile" width={36} height={36} className="rounded-full" />
               </button>
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-50">

@@ -1,15 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { sendEmail } from '@/lib/email';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+// Remove unused imports
+// import { NextRequest, NextResponse } from 'next/server';
+// import { prisma } from '@/lib/prisma';
+// import { sendEmail } from '@/lib/email';
+// import { getServerSession } from 'next-auth';
+// import { authOptions } from '@/lib/auth';
 
 // Helper function to get product recommendations based on scores
-function getProductRecommendations(scores: any) {
+function getProductRecommendations(scores: unknown) {
   const recommendations = [];
   
   // High-Yield Savings Account
-  if (scores.some((s: any) => s.section === "Income & Budgeting" && s.score / s.maxScore >= 0.7)) {
+  if ((scores as any[]).some((s: any) => s.section === "Income & Budgeting" && s.score / s.maxScore >= 0.7)) {
     recommendations.push({
       category: "High-Yield Savings Account",
       explanation: "With your strong income and budgeting habits, you're well-positioned to maximize your savings. A high-yield savings account can help your money work harder for you.",
@@ -29,7 +30,7 @@ function getProductRecommendations(scores: any) {
   }
 
   // Investment Portfolio
-  if (scores.some((s: any) => s.section === "Investing" && s.score / s.maxScore < 0.5)) {
+  if ((scores as any[]).some((s: any) => s.section === "Investing" && s.score / s.maxScore < 0.5)) {
     recommendations.push({
       category: "Investment Portfolio",
       explanation: "Your quiz results indicate room for growth in your investment strategy. Our professionally managed portfolios can help you build long-term wealth with minimal effort.",
@@ -49,7 +50,7 @@ function getProductRecommendations(scores: any) {
   }
 
   // Retirement Planning
-  if (scores.some((s: any) => s.section === "Retirement" && s.score / s.maxScore < 0.6)) {
+  if ((scores as any[]).some((s: any) => s.section === "Retirement" && s.score / s.maxScore < 0.6)) {
     recommendations.push({
       category: "Retirement Planning",
       explanation: "Your retirement readiness score suggests an opportunity to strengthen your long-term financial security. Our retirement tools can help you get on track.",
@@ -69,7 +70,7 @@ function getProductRecommendations(scores: any) {
   }
 
   // Credit Building
-  if (scores.some((s: any) => s.section === "Credit Score" && s.score / s.maxScore < 0.7)) {
+  if ((scores as any[]).some((s: any) => s.section === "Credit Score" && s.score / s.maxScore < 0.7)) {
     recommendations.push({
       category: "Credit Building Tools",
       explanation: "Your credit score has room for improvement. Our credit building tools can help you track and improve your creditworthiness.",
