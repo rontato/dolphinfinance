@@ -1,6 +1,5 @@
 "use client";
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
@@ -22,7 +21,7 @@ export default function Header() {
     <header className="w-full bg-white shadow flex items-center justify-between px-6 py-3">
       <div className="flex items-center space-x-2">
         <Link href="/" onClick={() => { window.location.href = '/'; }}>
-          <Image src="/assets/Logo + Logo Text.png" alt="Logo" width={160} height={40} priority />
+          <img src="/assets/Logo + Logo Text.png" alt="Logo" width={160} height={40} style={{ objectFit: 'contain' }} />
         </Link>
       </div>
       <div className="flex items-center space-x-4">
@@ -30,13 +29,18 @@ export default function Header() {
           <>
             {latestScore !== null && (
               <div className="flex items-center space-x-2">
-                <Image src="/assets/Health Score Bar.png" alt="Health Score Bar" width={120} height={24} />
-                <span className="font-bold text-[#0058C0]">{latestScore}/100</span>
+                <div className="w-32 h-3 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-[#0058C0] transition-all duration-500"
+                    style={{ width: `${latestScore}%` }}
+                  />
+                </div>
+                <span className="font-bold text-[#0058C0] text-lg">{latestScore}/100</span>
               </div>
             )}
             <div className="relative">
               <button onClick={() => setDropdownOpen(v => !v)} className="focus:outline-none">
-                <Image src={session.user.image || "https://cdn-icons-png.flaticon.com/512/149/149071.png"} alt="Profile" width={36} height={36} className="rounded-full" />
+                <img src={(session.user as any)?.image ?? "https://cdn-icons-png.flaticon.com/512/149/149071.png"} alt="Profile" width={36} height={36} className="rounded-full" />
               </button>
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-50">

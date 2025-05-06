@@ -70,7 +70,7 @@ export default function QuizResultPage({ params }: Props) {
           productName: product.name,
           productLink: product.link,
         }),
-      });
+  });
     } catch (error) {
       console.error('Error tracking link click:', error);
     }

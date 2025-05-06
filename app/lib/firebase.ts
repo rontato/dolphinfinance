@@ -4,13 +4,13 @@ import { getFirestore } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBJzqvtBmtMhr_25rjDTEDY8MikiTaXVL8",
-  authDomain: "dolphin-finance-quiz.firebaseapp.com",
-  projectId: "dolphin-finance-quiz",
-  storageBucket: "dolphin-finance-quiz.firebasestorage.app",
-  messagingSenderId: "171056666251",
-  appId: "1:171056666251:web:dcc821ee9c66f2f822e68e",
-  measurementId: "G-HCX65ZG9JZ"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
