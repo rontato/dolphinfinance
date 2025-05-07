@@ -32,7 +32,6 @@ model QuizResult {
   answers      Json
   score        Int
   maxScore     Int
-  recommendations Json
   createdAt    DateTime @default(now())
   emailSubscription EmailSubscription?
   linkClicks   LinkClick[]

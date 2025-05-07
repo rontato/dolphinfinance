@@ -3,25 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import { generateProductRecommendations, ProductCategory } from '../lib/generateProductRecommendations';
 
 interface QuizResult {
   id: number;
   score: number;
   maxScore: number;
-  recommendations: string;
+  answers: string;
   createdAt: string;
-}
-
-interface Recommendation {
-  section: string;
-  score: number;
-  maxScore: number;
-  details: string[];
-  products?: {
-    name: string;
-    description: string;
-    link: string;
-  }[];
 }
 
 export default function HistoryPage() {
@@ -96,10 +85,8 @@ export default function HistoryPage() {
         
         <div className="grid grid-cols-1 gap-6">
           {results.map((result) => {
-            const recommendations = typeof result.recommendations === 'string' 
-              ? JSON.parse(result.recommendations) as Recommendation[]
-              : result.recommendations as Recommendation[];
-            
+            const answers = typeof result.answers === 'string' ? JSON.parse(result.answers) : result.answers;
+            const recommendations: ProductCategory[] = generateProductRecommendations(answers);
             const scorePercentage = (result.score / result.maxScore) * 100;
             const date = new Date(result.createdAt).toLocaleDateString('en-US', {
               year: 'numeric',
@@ -135,9 +122,9 @@ export default function HistoryPage() {
                   </div>
 
                   <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {recommendations.slice(0, 2).map((rec: Recommendation) => (
-                      <div key={rec.section} className="bg-gray-50 rounded-lg p-4">
-                        <h3 className="font-semibold text-[#0058C0]">{rec.section}</h3>
+                    {recommendations.slice(0, 2).map((rec: ProductCategory) => (
+                      <div key={rec.title} className="bg-gray-50 rounded-lg p-4">
+                        <h3 className="font-semibold text-[#0058C0]">{rec.title}</h3>
                         <p className="text-sm text-gray-600 mt-1">
                           {rec.products?.[0]?.name || 'No recommendations'}
                         </p>

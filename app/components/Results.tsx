@@ -789,16 +789,11 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
             <h3 className="text-xl font-semibold text-[#0058C0] mb-2">Save Your Results</h3>
             <p className="text-gray-600 mb-4">Create an account to save your results and track your financial health over time.</p>
             <button
-              onClick={async () => {
-                setSigningIn(true);
-                setError("");
-                await signIn(undefined, { callbackUrl: window.location.href });
-                // After sign in, useEffect will save results
-              }}
+              onClick={() => { window.location.href = '/auth'; }}
               className="inline-block bg-[#0058C0] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#004494] transition"
               disabled={signingIn}
             >
-              {signingIn ? 'Signing In...' : 'Sign In / Create Account'}
+              Sign In / Create Account
             </button>
             {error && <div className="text-red-500 mt-2">{error}</div>}
           </div>
