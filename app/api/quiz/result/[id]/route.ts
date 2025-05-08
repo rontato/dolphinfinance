@@ -4,13 +4,13 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
     const result = await prisma.quizResult.findUnique({
-      where: { id: Number(params.id) },
+      where: { id: Number(context.params.id) },
       include: {
         user: {
           select: {
