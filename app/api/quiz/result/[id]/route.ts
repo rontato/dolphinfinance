@@ -5,12 +5,12 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
     const result = await prisma.quizResult.findUnique({
-      where: { id: Number(context.params.id) },
+      where: { id: Number(params.id) },
       include: {
         user: {
           select: {
