@@ -4,7 +4,6 @@ import Results from './Results';
 import { useInputLogger } from './useInputLogger';
 import React from 'react';
 import BankSelector from './BankSelector';
-import { submitQuizData } from '../lib/submitQuizData';
 
 interface QuestionOption {
   value: string;
