@@ -61,19 +61,8 @@ export default function QuizResultPage({ params }: Props) {
   }, [params.id]);
 
   const handleLearnMoreClick = async (product: { name: string; link: string }) => {
-    try {
-      await fetch('/api/track-link-click', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          quizResultId: Number(params.id),
-          productName: product.name,
-          productLink: product.link,
-        }),
-      });
-    } catch (error) {
-      console.error('Error tracking link click:', error);
-    }
+    // Link tracking removed
+    window.open(product.link, '_blank');
   };
 
   if (loading) {

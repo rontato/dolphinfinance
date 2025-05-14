@@ -28,17 +28,17 @@ const Recommendations: React.FC<RecommendationsProps> = ({ answers }) => {
       if (numCreditCards === 'three' || numCreditCards === 'four_plus') {
         categories.push({
           title: "🔥 Premium Travel Credit Cards",
-          description: "With your strong credit and experience, these premium travel cards can unlock luxury perks and big rewards.",
+          description: "Unlock luxury perks and free travel with a premium travel card. Don't let exclusive benefits and valuable rewards pass you by.",
           products: [
             {
               name: "American Express Platinum Card",
-              description: "If you travel frequently, the Amex Platinum is built for you. Enjoy premium lounge access, top-tier travel perks, and luxury hotel benefits that elevate every trip.",
+              description: "If you travel frequently, the Amex Platinum is for you. Enjoy premium lounge access, TSA precheck, a ton of credits, and luxury hotel benefits to elevate every trip.",
               applicationLink: "https://americanexpress.com/en-us/referral/platinum-card?ref=RONALW9f3v&xl=cp15",
               isAffiliate: true
             },
             {
               name: "Chase Sapphire Reserve",
-              description: "If you want exceptional value on travel and dining, the Sapphire Reserve offers huge point multipliers, top-tier protections, and a $300 travel credit each year.",
+              description: "If you want exceptional value on travel and dining within the Chase ecosystem, the Sapphire Reserve offers lounge access, TSA precheck, top-tier protections, and a $300 travel credit each year.",
               applicationLink: "https://www.referyourchasecard.com/19r/HWKKN4IRXS",
               isAffiliate: true
             }
@@ -52,7 +52,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({ answers }) => {
       if (numCreditCards === 'one' || numCreditCards === 'two') {
         categories.push({
           title: "🌟 Rewards Credit Cards",
-          description: "Given your habits, these rewards cards are a great way to get more value from your spending.",
+          description: "Maximize your spending power with these rewards cards. Big sign-up bonuses and free travel are waiting for you—don't miss out!",
           products: [
             {
               name: "American Express Gold Card",
@@ -64,7 +64,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({ answers }) => {
               name: "Chase Sapphire Preferred",
               description: "A top choice for travelers looking to earn flexible rewards without a huge annual fee. Great for dining, travel, and everyday spending.",
               applicationLink: "https://www.referyourchasecard.com/19r/HWKKN4IRXS",
-              isAffiliate: false
+              isAffiliate: true
             }
           ]
         });
@@ -76,7 +76,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({ answers }) => {
         (numCreditCards === 'none' || numCreditCards === 'one')) {
       categories.push({
         title: "💸 No Annual Fee Credit Cards",
-        description: "Because you're looking to maximize rewards without extra costs, these no annual fee cards are a great fit for your situation.",
+        description: "Start building your credit with one of these no-fee cards—it's the smartest way to unlock better loan rates and earn rewards as you spend.",
         products: [
           {
             name: "Discover it® Cash Back Card",
@@ -98,7 +98,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({ answers }) => {
     if (creditScore === 'poor' || creditScore === 'unknown' || numCreditCards === 'none') {
       categories.push({
         title: "🔒 Credit Building Cards",
-        description: "Because you're building or rebuilding credit, these secured cards are a safe way to start improving your score.",
+        description: "Secured cards are your best first step to rebuilding credit. Take action now and open the door to better cards and loans down the road.",
         products: [
           {
             name: "Chase Freedom Rise",
@@ -127,7 +127,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({ answers }) => {
     if (hasChecking === 'no' || hasChecking === 'unknown') {
       categories.push({
         title: "🏦 Checking Accounts",
-        description: "Since you don't have a checking account, these options make managing your money easy and fee-free.",
+        description: "Open a checking account that makes managing your money easy and fee-free. Stop paying unnecessary fees and enjoy modern banking features.",
         products: [
           {
             name: "SoFi Checking & Savings",
@@ -148,7 +148,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({ answers }) => {
     if (hasHYSA === 'no' || hasHYSA === 'unknown') {
       categories.push({
         title: "💰 High-Yield Savings",
-        description: "Because you don't have a high-yield savings account, these options can help you grow your savings faster.",
+        description: "Grow your savings faster with a high-yield account. The sooner you start, the more you'll earn in interest and financial security.",
         products: [
           {
             name: "SoFi Checking & Savings",
@@ -177,7 +177,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({ answers }) => {
     if (hasBrokerage === 'no' || hasBrokerage === 'unknown') {
       categories.push({
         title: "📈 Investment Accounts",
-        description: "Since you don't have an investment account, these platforms are a great way to start building wealth.",
+        description: "Investing early is the key to building wealth. Open an investment account and let compounding returns work for your future.",
         products: [
           {
             name: "Fidelity Investments",
@@ -225,7 +225,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({ answers }) => {
     if (hasRothIRA === 'no' || hasRothIRA === 'unknown') {
       categories.push({
         title: "🏦 Retirement Accounts",
-        description: "Because you don't have a Roth IRA, these options can help you start saving for retirement tax-free.",
+        description: "A Roth IRA is your ticket to tax-free retirement growth. The earlier you start, the more you'll benefit from years of compounding.",
         products: [
           {
             name: "Fidelity Roth IRA",
@@ -246,7 +246,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({ answers }) => {
     if (has401k === 'no' || has401k === 'unknown') {
       categories.push({
         title: "💼 401(k) Information",
-        description: "Since you don't have a 401(k), here's what you need to know about employer retirement plans.",
+        description: "Understanding 401(k)s now sets you up for long-term success. Don't leave employer contributions and retirement savings on the table.",
         products: [
           {
             name: "401(k) Education",
@@ -326,7 +326,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({ answers }) => {
           Personalized Recommendations
         </h2>
         <p className="text-xl text-gray-600">
-          Based on your answers, here are the financial products we recommend:
+          Here is what you need to do today to improve your finances
         </p>
       </motion.div>
 

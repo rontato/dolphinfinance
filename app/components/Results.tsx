@@ -112,17 +112,13 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
     // Calculate total monthly debt payments (rough estimation)
     const studentLoanDebt = Number(answers[14]) || 0;
     const carLoanDebt = Number(answers[16]) || 0;
-    const mortgageDebt = Number(answers[18]) || 0;
     const creditCardDebt = Number(answers[20]) || 0;
-    const otherDebt = Number(answers[23]) || 0;
 
-    // Rough monthly payment estimation
+    // Rough monthly payment estimation (rebalance weights)
     const monthlyDebtPayment = 
-      (studentLoanDebt * 0.01) + // ~1% of student loan balance
-      (carLoanDebt * 0.02) +    // ~2% of car loan balance
-      (mortgageDebt * 0.005) +  // ~0.5% of mortgage balance
-      (creditCardDebt * 0.03) + // ~3% of credit card balance
-      (otherDebt * 0.02);      // ~2% of other debt balance
+      (studentLoanDebt * 0.012) + // ~1.2% of student loan balance
+      (carLoanDebt * 0.025) +    // ~2.5% of car loan balance
+      (creditCardDebt * 0.035); // ~3.5% of credit card balance
 
     // Debt-to-Income Ratio (10 points)
     if (monthlyIncome > 0) {
@@ -144,32 +140,20 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
       }
     }
 
-    // Debt Diversification & Type (10 points)
+    // Debt Diversification & Type (10 points, rebalance)
     const hasStudentLoan = answers[13] === 'yes';
     const hasCarLoan = answers[15] === 'yes';
-    const hasMortgage = answers[17] === 'yes';
     const hasCreditCardDebt = answers[19] === 'yes';
-    const hasOtherDebt = answers[21] === 'yes';
-    const otherDebtTypes = Array.isArray(answers[22]) ? answers[22] : [];
 
-    if (!hasStudentLoan && !hasCarLoan && !hasMortgage && !hasCreditCardDebt && !hasOtherDebt) {
+    if (!hasStudentLoan && !hasCarLoan && !hasCreditCardDebt) {
       score += 10;
       details.push('✓ No debt (+10 points)');
-    } else if (hasMortgage && !hasCreditCardDebt && !hasOtherDebt) {
-      score += 8;
-      details.push('✓ Only mortgage debt (+8 points)');
-    } else if (hasMortgage && (hasStudentLoan || hasCarLoan) && !hasCreditCardDebt && !hasOtherDebt) {
+    } else if ((hasStudentLoan || hasCarLoan) && !hasCreditCardDebt) {
       score += 7;
-      details.push('✓ Mortgage + manageable debt (+7 points)');
-    } else if ((hasStudentLoan || hasCarLoan) && !hasMortgage && !hasCreditCardDebt && !hasOtherDebt) {
-      score += 6;
-      details.push('✓ Only manageable debt (+6 points)');
-    } else if (hasCreditCardDebt || otherDebtTypes.includes('personal')) {
+      details.push('✓ Only manageable debt (+7 points)');
+    } else if (hasCreditCardDebt) {
       score += 2;
       details.push('⚠ Has high-interest debt (+2 points)');
-    } else if (otherDebtTypes.includes('payday') || otherDebtTypes.includes('medical')) {
-      score += 0;
-      details.push('✗ Has payday loans or medical debt (+0 points)');
     }
 
     return {

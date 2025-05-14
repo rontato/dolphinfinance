@@ -225,27 +225,16 @@ const questions: Question[] = [
     prefix: "$",
     condition: { questionId: 15, expectedValue: "yes" }
   },
-  {
-    id: 17,
-    section: "🏛️ Section 3: Debt Management",
-    text: "Do you have a mortgage?",
-    type: "multiple_choice",
-    options: [
-      { value: "yes", label: "Yes" },
-      { value: "no", label: "No" }
-    ]
-  },
-  {
-    id: 18,
-    section: "🏛️ Section 3: Debt Management",
-    text: "What's your mortgage balance?",
-    type: "slider",
-    min: 0,
-    max: 1000000,
-    step: 5000,
-    prefix: "$",
-    condition: { questionId: 17, expectedValue: "yes" }
-  },
+  // {
+  //   id: 17,
+  //   section: "🏛️ Section 3: Debt Management",
+  //   text: "Do you have a mortgage?",
+  //   type: "multiple_choice",
+  //   options: [
+  //     { value: "yes", label: "Yes" },
+  //     { value: "no", label: "No" }
+  //   ]
+  // },
   {
     id: 19,
     section: "🏛️ Section 3: Debt Management",
@@ -267,40 +256,40 @@ const questions: Question[] = [
     prefix: "$",
     condition: { questionId: 19, expectedValue: "yes" }
   },
-  {
-    id: 21,
-    section: "🏛️ Section 3: Debt Management",
-    text: "Do you have any other forms of debt? (personal loans, medical bills, etc.)",
-    type: "multiple_choice",
-    options: [
-      { value: "yes", label: "Yes" },
-      { value: "no", label: "No" }
-    ]
-  },
-  {
-    id: 22,
-    section: "🏛️ Section 3: Debt Management",
-    text: "What type of debt do you have? (Select all that apply)",
-    type: "multi_select",
-    options: [
-      { value: "personal", label: "Personal loans" },
-      { value: "medical", label: "Medical debt" },
-      { value: "payday", label: "Payday loans" },
-      { value: "other", label: "Other" }
-    ],
-    condition: { questionId: 21, expectedValue: "yes" }
-  },
-  {
-    id: 23,
-    section: "🏛️ Section 3: Debt Management",
-    text: "What's your total other debt?",
-    type: "slider",
-    min: 0,
-    max: 100000,
-    step: 1000,
-    prefix: "$",
-    condition: { questionId: 21, expectedValue: "yes" }
-  },
+  // {
+  //   id: 21,
+  //   section: "🏛️ Section 3: Debt Management",
+  //   text: "Do you have any other forms of debt? (personal loans, medical bills, etc.)",
+  //   type: "multiple_choice",
+  //   options: [
+  //     { value: "yes", label: "Yes" },
+  //     { value: "no", label: "No" }
+  //   ]
+  // },
+  // {
+  //   id: 22,
+  //   section: "🏛️ Section 3: Debt Management",
+  //   text: "What type of debt do you have? (Select all that apply)",
+  //   type: "multi_select",
+  //   options: [
+  //     { value: "personal", label: "Personal loans" },
+  //     { value: "medical", label: "Medical debt" },
+  //     { value: "payday", label: "Payday loans" },
+  //     { value: "other", label: "Other" }
+  //   ],
+  //   condition: { questionId: 21, expectedValue: "yes" }
+  // },
+  // {
+  //   id: 23,
+  //   section: "🏛️ Section 3: Debt Management",
+  //   text: "What's your total other debt?",
+  //   type: "slider",
+  //   min: 0,
+  //   max: 100000,
+  //   step: 1000,
+  //   prefix: "$",
+  //   condition: { questionId: 21, expectedValue: "yes" }
+  // },
   // Section 4: Debt & Credit Health
   {
     id: 24,

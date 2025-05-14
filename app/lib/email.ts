@@ -9,15 +9,12 @@ interface EmailParams {
 export async function sendEmail({ to, subject, html }: EmailParams) {
   const apiKey = process.env.SENDGRID_API_KEY;
   if (!apiKey) {
-    console.error('SendGrid API key not found in environment variables');
-    throw new Error('SendGrid API key not found');
+    console.warn('SendGrid API key not found - email functionality disabled');
+    return false; // Gracefully handle missing API key
   }
 
-  console.log('Initializing SendGrid with API key...');
-  sgMail.setApiKey(apiKey);
-
   try {
-    console.log(`Attempting to send email to ${to}...`);
+    sgMail.setApiKey(apiKey);
     const msg = {
       to,
       from: 'ronald@dolphinfinance.io', // Using the verified sender email
@@ -30,23 +27,7 @@ export async function sendEmail({ to, subject, html }: EmailParams) {
     console.log('SendGrid API Response:', response);
     return true;
   } catch (error: any) {
-    console.error('Detailed SendGrid error:', {
-      message: error.message,
-      response: error.response?.body,
-      code: error.code,
-      stack: error.stack,
-      headers: error.response?.headers,
-      statusCode: error.response?.statusCode
-    });
-    
-    // Extract more detailed error information
-    let errorMessage = 'Failed to send email';
-    if (error.response?.body?.errors) {
-      errorMessage = error.response.body.errors.map((err: any) => err.message).join(', ');
-    } else if (error.message) {
-      errorMessage = error.message;
-    }
-    
-    throw new Error(`SendGrid Error: ${errorMessage}`);
+    console.error('SendGrid error:', error.message);
+    return false; // Return false instead of throwing error
   }
 } 

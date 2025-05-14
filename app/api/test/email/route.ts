@@ -1,3 +1,4 @@
+/*
 import { NextResponse } from 'next/server';
 import sgMail from '@sendgrid/mail';
 
@@ -53,4 +54,5 @@ export async function GET() {
       response: error.response?.body
     }, { status: 500 });
   }
-} 
+}
+*/ 

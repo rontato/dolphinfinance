@@ -36,7 +36,7 @@ const creditCards: CreditCard[] = [
     name: 'Discover it® Cash Back',
     bank: 'Discover',
     logo: '/images/discover-logo.svg',
-    description: 'Great for rotating 5% cash back categories',
+    description: 'Best first credit card hands down. $100 bonus for signing up and all cashback doubled in the first year. 5% cash back in rotating quarterly categories and 1% cash back on all other purchases.',
     benefits: [
       '5% cash back in rotating quarterly categories',
       'Cash back match in first year',
@@ -50,7 +50,7 @@ const creditCards: CreditCard[] = [
     name: 'American Express® Gold Card',
     bank: 'American Express',
     logo: '/images/amex-logo.svg',
-    description: 'Perfect if you spend heavily on groceries and dining. The Amex Gold rewards foodies and travelers with generous points and bonus dining credits.',
+    description: 'Perfect if you spend a lot on dining and groceries. The Amex Gold rewards foodies and travelers with generous points $120/year uber credit, $120/year dining credit, $100/year Resy credit, and more.',
     benefits: [
       '4X points at restaurants, including takeout and delivery',
       '4X points at U.S. supermarkets (up to $25,000/year)',
