@@ -16,13 +16,13 @@ export default function LoginPage() {
     const res = await signIn('credentials', {
       email,
       password,
-      redirect: false,
+      callbackUrl: '/',
     });
     if (res?.error) {
       setError('Invalid email or password');
       return;
     }
-    router.push('/');
+    // router.push('/'); // Removed as NextAuth will handle the redirect
   };
 
   return (
