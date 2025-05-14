@@ -26,12 +26,7 @@ interface Recommendation {
   }[];
 }
 
-type Props = {
-  params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
-
-export default function QuizResultPage({ params }: Props) {
+export default function QuizResultPage({ params, searchParams }: any) {
   const [result, setResult] = useState<QuizResult | null>(null);
   const [recommendations, setRecommendations] = useState<ProductCategory[]>([]);
   const [loading, setLoading] = useState(true);
