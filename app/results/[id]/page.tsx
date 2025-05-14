@@ -22,13 +22,6 @@ interface ScoreBreakdown {
   details: string[];
 }
 
-interface PageProps {
-  params: {
-    id: string;
-  };
-  searchParams: { [key: string]: string | string[] | undefined };
-}
-
 const calculateIncomeAndBudgetingScore = (answers: Record<number, any>): ScoreBreakdown => {
   let score = 0;
   const details: string[] = [];
@@ -323,7 +316,7 @@ const calculateTotalScore = (answers: Record<number, any>) => {
   };
 };
 
-export default function QuizResultPage({ params, searchParams }: PageProps) {
+export default function QuizResultPage({ params }: { params: { id: string } }) {
   const [result, setResult] = useState<QuizResult | null>(null);
   const [recommendations, setRecommendations] = useState<ProductCategory[]>([]);
   const [scoreBreakdowns, setScoreBreakdowns] = useState<ScoreBreakdown[]>([]);
