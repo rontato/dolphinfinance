@@ -316,7 +316,8 @@ const calculateTotalScore = (answers: Record<number, any>) => {
   };
 };
 
-export default function QuizResultPage({ params }: { params: { id: string } }) {
+export default async function QuizResultPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const [result, setResult] = useState<QuizResult | null>(null);
   const [recommendations, setRecommendations] = useState<ProductCategory[]>([]);
   const [scoreBreakdowns, setScoreBreakdowns] = useState<ScoreBreakdown[]>([]);
@@ -326,7 +327,7 @@ export default function QuizResultPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     const fetchResult = async () => {
       try {
-        const res = await fetch(`/api/quiz/${params.id}`);
+        const res = await fetch(`/api/quiz/${id}`);
         if (!res.ok) throw new Error('Failed to fetch quiz result');
         const data = await res.json();
         setResult(data);
@@ -347,7 +348,7 @@ export default function QuizResultPage({ params }: { params: { id: string } }) {
     };
 
     fetchResult();
-  }, [params.id]);
+  }, [id]);
 
   const handleLearnMoreClick = async (product: RecommendationProduct) => {
     window.open(product.applicationLink, '_blank');
