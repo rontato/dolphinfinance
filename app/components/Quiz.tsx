@@ -756,17 +756,10 @@ export default function Quiz({ onShowResults }: QuizProps) {
 
   // Call onShowResults only after isComplete becomes true, not during render
   useEffect(() => {
-    if (isComplete && !hasSavedToFirestore) {
-      // Save quiz data to Firestore
-      submitQuizData({
-        answers,
-        completedAt: new Date().toISOString(),
-      }).then(() => setHasSavedToFirestore(true));
-      if (onShowResults) {
-        onShowResults();
-      }
+    if (isComplete && onShowResults) {
+      onShowResults();
     }
-  }, [isComplete, hasSavedToFirestore, answers, onShowResults]);
+  }, [isComplete, onShowResults]);
 
   if (isComplete) {
     return <Results answers={answers} />;

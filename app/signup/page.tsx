@@ -10,22 +10,47 @@ export default function SignupPage() {
   const [error, setError] = useState('');
   const router = useRouter();
 
+  const LOCAL_STORAGE_KEY = 'unsaved_quiz_result';
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    console.log('Submitting signup form:', { email, password });
     const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
+    console.log('Received response from /api/auth/register:', res.status);
     const data = await res.json();
     if (!res.ok) {
+      console.error('Signup error:', data.error);
       setError(data.error || 'Signup failed');
       return;
     }
     // Auto sign in after registration
-    await signIn('credentials', { email, password, callbackUrl: '/' });
-    router.push('/');
+    console.log('Signup successful, signing in...');
+    const loginRes = await signIn('credentials', { email, password, redirect: false });
+    if (loginRes?.error) {
+      setError('Auto-login failed');
+      return;
+    }
+    // If signup+login successful, check for unsaved quiz result
+    if (typeof window !== 'undefined') {
+      const local = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (local) {
+        try {
+          const quizData = JSON.parse(local);
+          await fetch('/api/quiz/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(quizData),
+          });
+          localStorage.removeItem(LOCAL_STORAGE_KEY);
+        } catch {}
+      }
+    }
+    router.push('/history');
   };
 
   return (

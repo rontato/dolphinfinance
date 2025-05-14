@@ -38,26 +38,30 @@ export default function QuizResultPage({ params }: Props) {
   const [scoreBreakdownOpen, setScoreBreakdownOpen] = useState(false);
 
   useEffect(() => {
-    const fetchResult = async () => {
+    const fetchHistory = async () => {
       try {
-        const response = await fetch(`/api/quiz/result/${params.id}`);
+        const response = await fetch('/api/quiz/history');
         if (!response.ok) {
-          throw new Error('Failed to fetch result');
+          throw new Error('Failed to fetch history');
         }
         const data = await response.json();
-        setResult(data);
-        // Generate recommendations from answers
-        const answers = typeof data.answers === 'string' ? JSON.parse(data.answers) : data.answers;
+        const found = data.find((r: QuizResult) => String(r.id) === params.id);
+        if (!found) {
+          setResult(null);
+          setLoading(false);
+          return;
+        }
+        setResult(found);
+        const answers = typeof found.answers === 'string' ? JSON.parse(found.answers) : found.answers;
         setRecommendations(generateProductRecommendations(answers));
       } catch (error) {
         console.error('Error fetching result:', error);
-        notFound();
+        setResult(null);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchResult();
+    fetchHistory();
   }, [params.id]);
 
   const handleLearnMoreClick = async (product: { name: string; link: string }) => {

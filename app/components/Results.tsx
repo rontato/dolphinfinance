@@ -16,8 +16,10 @@ interface ScoreBreakdown {
   details: string[];
 }
 
+const LOCAL_STORAGE_KEY = 'unsaved_quiz_result';
+
 const Results: React.FC<ResultsProps> = ({ answers }) => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [saved, setSaved] = useState(false);
   const [scoreBreakdownOpen, setScoreBreakdownOpen] = useState(false);
   const [signingIn, setSigningIn] = useState(false);
@@ -503,38 +505,54 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
   */
   // --- End Percentile Breakdown Feature ---
 
-  // Save results to user profile after sign in
+  // Save results to localStorage if not logged in
+  useEffect(() => {
+    if (!session && !saved) {
+      const quizData = {
+        answers,
+        score: percentage,
+        maxScore,
+        breakdowns,
+      };
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(quizData));
+    }
+  }, [session, saved, answers, percentage, maxScore, breakdowns]);
+
+  // On login, check for unsaved quiz result in localStorage and save it
   useEffect(() => {
     if (session && !saved) {
-      // Save quiz results to user profile
+      const local = localStorage.getItem(LOCAL_STORAGE_KEY);
+      let quizData;
+      if (local) {
+        try {
+          quizData = JSON.parse(local);
+        } catch {}
+      }
+      const payload = quizData || { answers, score: percentage, maxScore, breakdowns };
       const saveResults = async () => {
         try {
           setSigningIn(true);
           setError("");
           const res = await fetch('/api/quiz/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          answers,
-          score: percentage,
-          maxScore,
-          recommendations: breakdowns,
-        }),
-      });
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
           if (!res.ok) {
             const data = await res.json();
             throw new Error(data.error || 'Failed to save results');
           }
-      setSaved(true);
+          setSaved(true);
+          localStorage.removeItem(LOCAL_STORAGE_KEY);
         } catch (err: any) {
           setError(err.message || 'Failed to save results');
-    } finally {
+        } finally {
           setSigningIn(false);
-    }
-  };
+        }
+      };
       saveResults();
     }
-  }, [session]);
+  }, [session, saved]);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">

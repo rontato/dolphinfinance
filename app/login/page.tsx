@@ -10,19 +10,36 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const router = useRouter();
 
+  const LOCAL_STORAGE_KEY = 'unsaved_quiz_result';
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     const res = await signIn('credentials', {
       email,
       password,
-      callbackUrl: '/',
+      redirect: false,
     });
     if (res?.error) {
       setError('Invalid email or password');
       return;
     }
-    // router.push('/'); // Removed as NextAuth will handle the redirect
+    // If login successful, check for unsaved quiz result
+    if (typeof window !== 'undefined') {
+      const local = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (local) {
+        try {
+          const quizData = JSON.parse(local);
+          await fetch('/api/quiz/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(quizData),
+          });
+          localStorage.removeItem(LOCAL_STORAGE_KEY);
+        } catch {}
+      }
+    }
+    router.push('/history');
   };
 
   return (
