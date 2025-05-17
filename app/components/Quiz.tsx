@@ -46,7 +46,12 @@ interface BankQuestion extends BaseQuestion {
   type: "bank";
 }
 
-type Question = MultipleChoiceQuestion | SliderQuestion | TextQuestion | MultiSelectQuestion | BankQuestion;
+interface BrokerageSelectQuestion extends BaseQuestion {
+  type: "brokerage_select";
+  options: QuestionOption[];
+}
+
+type Question = MultipleChoiceQuestion | SliderQuestion | TextQuestion | MultiSelectQuestion | BankQuestion | BrokerageSelectQuestion;
 
 const questions: Question[] = [
   // Section 1: Income & Budgeting
@@ -332,8 +337,20 @@ const questions: Question[] = [
   {
     id: 27,
     section: "📈 Section 5: Investing Knowledge & Habits",
-    text: "Which brokerage do you use?",
-    type: "text",
+    text: "Which brokerage account do you use?",
+    type: "brokerage_select",
+    options: [
+      { value: "Robinhood", label: "Robinhood" },
+      { value: "Webull", label: "Webull" },
+      { value: "SoFi Invest", label: "SoFi Invest" },
+      { value: "Moomoo", label: "Moomoo" },
+      { value: "Fidelity Investments", label: "Fidelity Investments" },
+      { value: "Charles Schwab", label: "Charles Schwab" },
+      { value: "E*TRADE", label: "E*TRADE" },
+      { value: "Public", label: "Public" },
+      { value: "eToro", label: "eToro" },
+      { value: "Interactive Brokers", label: "Interactive Brokers" }
+    ],
     condition: { questionId: 26, expectedValue: "yes" }
   },
   {
@@ -739,6 +756,30 @@ export default function Quiz({ onShowResults }: QuizProps) {
               onChange={handleAnswer}
               placeholder="Select your bank"
             />
+            {renderNavigationButtons(
+              () => handleAnswer(answers[question.id] || ""),
+              !answers[question.id]
+            )}
+          </div>
+        );
+
+      case 'brokerage_select':
+        return (
+          <div className="space-y-4">
+            <select
+              value={answers[question.id] as string || ""}
+              onChange={(e) => {
+                handleAnswer(e.target.value);
+              }}
+              className="w-full px-3 py-2 border rounded-md text-gray-900 font-medium bg-white focus:ring-2 focus:ring-[#0058C0] focus:border-[#0058C0]"
+            >
+              <option value="">Select a brokerage</option>
+              {question.options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
             {renderNavigationButtons(
               () => handleAnswer(answers[question.id] || ""),
               !answers[question.id]

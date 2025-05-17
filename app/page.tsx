@@ -19,7 +19,7 @@ export default function Home() {
               <span className="block" style={{ color: '#0058C0' }}>Dive into your Finances</span>
             </h1>
             <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-              In college and don't know where to get started with personal finance? Take this quiz to find out 💵
+              Are you in college and don't know where to get started with your personal finances? Take this quiz to find out 💵
             </p>
           </div>
         </div>

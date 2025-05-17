@@ -87,6 +87,16 @@ export default function BankSelector({ value, onChange, placeholder = 'Select yo
             />
           </div>
 
+          {searchTerm.trim() &&
+            !banks.some(bank => bank.name.toLowerCase() === searchTerm.trim().toLowerCase()) && (
+              <div
+                className="p-4 border-b bg-blue-50 cursor-pointer hover:bg-blue-100 text-blue-700 font-semibold"
+                onClick={() => handleBankSelect(searchTerm.trim())}
+              >
+                Add "{searchTerm.trim()}" as your bank
+              </div>
+            )}
+
           <div className="grid grid-cols-2 gap-4 p-4">
             {filteredBanks.map((bank) => (
               <div
