@@ -1,0 +1,16 @@
+{
+  "name": "Dolphin Finance",
+  "short_name": "Dolphin",
+  "description": "Discover your financial health score and get personalized recommendations",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0058C0",
+  "icons": [
+    {
+      "src": "/assets/DolphinFinance Logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+} 

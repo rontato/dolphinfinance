@@ -2,8 +2,9 @@ import { RecommendationProduct, ProductCategory } from '../lib/generateProductRe
 
 export function getBankingRecommendations(answers: Record<number, string | string[] | number>): ProductCategory[] {
   const hasChecking = answers[4] as string;
-  const hasHYSA = answers[10] as string;
+  const hasHYSA = answers[7] as string;
   const categories: ProductCategory[] = [];
+  
   if (hasChecking === 'no' || hasChecking === 'unknown') {
     categories.push({
       title: "🏦 Checking Accounts",
@@ -24,6 +25,7 @@ export function getBankingRecommendations(answers: Record<number, string | strin
       ]
     });
   }
+
   if (hasHYSA === 'no' || hasHYSA === 'unknown') {
     categories.push({
       title: "💰 High-Yield Savings",

@@ -21,6 +21,8 @@ declare module 'next-auth/jwt' {
   }
 }
 
+console.log('Prisma client before adapter:', prisma, typeof prisma.user?.findUnique);
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
@@ -47,4 +49,49 @@ export const authOptions: NextAuthOptions = {
   ],
   session: { strategy: 'jwt' as const },
   secret: process.env.NEXTAUTH_SECRET,
+  callbacks: {
+    async signIn({ user, account, profile, email, credentials }) {
+      // Only run for Google sign-in
+      if (account?.provider === 'google') {
+        // Find user by email
+        const existingUser = await prisma.user.findUnique({ where: { email: user.email } });
+        if (existingUser) {
+          // Check if Google account is already linked
+          const googleAccount = await prisma.account.findFirst({
+            where: {
+              userId: existingUser.id,
+              provider: 'google',
+              providerAccountId: account.providerAccountId,
+            },
+          });
+          if (!googleAccount) {
+            // Link Google account to existing user
+            await prisma.account.create({
+              data: {
+                userId: existingUser.id,
+                type: account.type,
+                provider: account.provider,
+                providerAccountId: account.providerAccountId,
+                access_token: account.access_token,
+                id_token: account.id_token,
+                refresh_token: account.refresh_token,
+                expires_at: account.expires_at,
+                token_type: account.token_type,
+                scope: account.scope,
+                session_state: account.session_state,
+              },
+            });
+          }
+          // Override user.id to ensure session is for the existing user
+          user.id = existingUser.id;
+        }
+      }
+      // Always allow sign in
+      return true;
+    },
+    async redirect({ url, baseUrl }) {
+      // Always redirect to home after sign in
+      return baseUrl;
+    },
+  },
 }; 

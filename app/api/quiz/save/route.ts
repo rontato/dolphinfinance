@@ -5,8 +5,10 @@ import { prisma } from '@/lib/prisma';
 
 export async function POST(req: NextRequest) {
   try {
-    const { answers, score, maxScore } = await req.json();
+    const { answers, score, maxScore, hash } = await req.json();
+    console.log('SAVE ENDPOINT HIT', { answers, score, maxScore, hash });
     if (!answers || typeof score !== 'number' || typeof maxScore !== 'number') {
+      console.log('Invalid input data', { answers, score, maxScore });
       return NextResponse.json({ 
         error: 'Invalid input data',
         details: 'Missing or invalid required fields'
@@ -37,10 +39,13 @@ export async function POST(req: NextRequest) {
         answers: JSON.stringify(answers),
         score,
         maxScore,
+        hash,
       },
     });
+    console.log('QUIZ RESULT SAVED', result);
     return NextResponse.json({ id: result.id });
   } catch (error) {
+    console.error('SAVE ERROR', error);
     return NextResponse.json({ 
       error: 'Failed to save results',
       details: error instanceof Error ? error.message : 'Unknown error'

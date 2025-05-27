@@ -18,12 +18,21 @@ interface ScoreBreakdown {
 
 const LOCAL_STORAGE_KEY = 'unsaved_quiz_result';
 
+// Use browser-compatible hash function
+async function hashAnswers(answers: Record<number, string | string[] | number>) {
+  const msgUint8 = new TextEncoder().encode(JSON.stringify(answers));
+  const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgUint8);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 const Results: React.FC<ResultsProps> = ({ answers }) => {
   const { data: session, status } = useSession();
   const [saved, setSaved] = useState(false);
   const [scoreBreakdownOpen, setScoreBreakdownOpen] = useState(false);
   const [signingIn, setSigningIn] = useState(false);
   const [error, setError] = useState("");
+  const [resultHash, setResultHash] = useState<string | null>(null);
   // Comment out email-related state
   // const [email, setEmail] = useState('');
   // const [isSubmitting, setIsSubmitting] = useState(false);
@@ -82,18 +91,10 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
       details.push('✗ No checking account (+0 points)');
     }
 
-    // Savings Account (5 points)
+    // High-Yield Savings Account (10 points)
     if (answers[7] === 'yes') {
-      score += 5;
-      details.push('✓ Has savings account (+5 points)');
-    } else {
-      details.push('✗ No savings account (+0 points)');
-    }
-
-    // High-Yield Savings Account (5 points)
-    if (answers[10] === 'yes') {
-      score += 5;
-      details.push('✓ Has high-yield savings account (+5 points)');
+      score += 10;
+      details.push('✓ Has high-yield savings account (+10 points)');
     } else {
       details.push('✗ No high-yield savings account (+0 points)');
     }
@@ -505,54 +506,79 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
   */
   // --- End Percentile Breakdown Feature ---
 
+  useEffect(() => {
+    hashAnswers(answers).then(setResultHash);
+  }, [answers]);
+
   // Save results to localStorage if not logged in
   useEffect(() => {
-    if (!session && !saved) {
+    if (!session && !saved && resultHash) {
       const quizData = {
         answers,
         score: percentage,
         maxScore,
         breakdowns,
+        hash: resultHash,
       };
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(quizData));
     }
-  }, [session, saved, answers, percentage, maxScore, breakdowns]);
+  }, [session, saved, answers, percentage, maxScore, breakdowns, resultHash]);
 
-  // On login, check for unsaved quiz result in localStorage and save it
+  // For logged-in users, save result only once on first render if not already saved and nothing in localStorage
   useEffect(() => {
-    if (session && !saved) {
+    if (session && !saved && resultHash) {
+      console.log('Attempting to save quiz result', { resultHash, session });
       const local = localStorage.getItem(LOCAL_STORAGE_KEY);
-      let quizData;
-      if (local) {
-        try {
-          quizData = JSON.parse(local);
-        } catch {}
-      }
-      const payload = quizData || { answers, score: percentage, maxScore, breakdowns };
-      const saveResults = async () => {
+      const saveResults = async (payload: any) => {
         try {
           setSigningIn(true);
           setError("");
-          const res = await fetch('/api/quiz/save', {
+          console.log('Checking for duplicate result with hash:', payload.hash);
+          const checkRes = await fetch('/api/quiz/result/check-duplicate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
+            body: JSON.stringify({ hash: payload.hash }),
           });
-          if (!res.ok) {
-            const data = await res.json();
-            throw new Error(data.error || 'Failed to save results');
+          const checkData = await checkRes.json();
+          console.log('Duplicate check result:', checkData);
+          if (!checkData.exists) {
+            console.log('Saving quiz result to API:', payload);
+            const res = await fetch('/api/quiz/save', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+            });
+            if (!res.ok) {
+              const data = await res.json();
+              console.error('Save failed:', data);
+              throw new Error(data.error || 'Failed to save results');
+            }
+            console.log('Quiz result saved successfully');
+          } else {
+            console.log('Quiz result already exists, not saving');
           }
           setSaved(true);
           localStorage.removeItem(LOCAL_STORAGE_KEY);
         } catch (err: any) {
           setError(err.message || 'Failed to save results');
+          console.error('Save error:', err);
         } finally {
           setSigningIn(false);
         }
       };
-      saveResults();
+      if (local) {
+        let quizData;
+        try {
+          quizData = JSON.parse(local);
+        } catch {}
+        const payload = quizData || { answers, score: percentage, maxScore, breakdowns, hash: resultHash };
+        saveResults(payload);
+      } else {
+        const payload = { answers, score: percentage, maxScore, breakdowns, hash: resultHash };
+        saveResults(payload);
+      }
     }
-  }, [session, saved]);
+  }, [session, saved, resultHash, answers, percentage, maxScore, breakdowns]);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -792,7 +818,7 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
             <p className="text-gray-600 mb-4">Create an account to save your results and track your financial health over time.</p>
             <button
               onClick={() => { window.location.href = '/auth'; }}
-              className="inline-block bg-[#0058C0] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#004494] transition"
+              className="inline-block bg-[#0058C0] text-white px-6 py-3 rounded-full font-semibold hover:opacity-90 transition duration-150 active:scale-95 active:opacity-80"
               disabled={signingIn}
             >
               Sign In / Create Account

@@ -9,7 +9,7 @@ export default function AuthPage() {
         <p className="mb-8 text-gray-700">To save your results and track your financial health, please log in or create an account.</p>
         <div className="flex flex-col gap-4">
           <Link href="/login">
-            <button className="w-full px-4 py-3 rounded bg-[#0058C0] text-white font-semibold hover:bg-[#004494] transition">Sign In</button>
+            <button className="w-full px-4 py-3 rounded-full bg-[#0058C0] text-white font-semibold hover:opacity-90 transition duration-150 active:scale-95 active:opacity-80">Sign In</button>
           </Link>
           <Link href="/signup">
             <button className="w-full px-4 py-3 rounded border border-[#0058C0] text-[#0058C0] font-semibold hover:bg-[#e6f0fa] transition">Create Account</button>

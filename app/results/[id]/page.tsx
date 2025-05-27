@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { notFound } from 'next/navigation';
+import { useParams, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { generateProductRecommendations, ProductCategory, RecommendationProduct } from '../../lib/generateProductRecommendations';
@@ -316,8 +316,9 @@ const calculateTotalScore = (answers: Record<number, any>) => {
   };
 };
 
-export default async function QuizResultPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export default function QuizResultPage() {
+  const params = useParams();
+  const id = params?.id;
   const [result, setResult] = useState<QuizResult | null>(null);
   const [recommendations, setRecommendations] = useState<ProductCategory[]>([]);
   const [scoreBreakdowns, setScoreBreakdowns] = useState<ScoreBreakdown[]>([]);
@@ -325,9 +326,10 @@ export default async function QuizResultPage({ params }: { params: Promise<{ id:
   const [scoreBreakdownOpen, setScoreBreakdownOpen] = useState(false);
 
   useEffect(() => {
+    if (!id) return;
     const fetchResult = async () => {
       try {
-        const res = await fetch(`/api/quiz/${id}`);
+        const res = await fetch(`/api/quiz/result/${id}`);
         if (!res.ok) throw new Error('Failed to fetch quiz result');
         const data = await res.json();
         setResult(data);
@@ -346,7 +348,6 @@ export default async function QuizResultPage({ params }: { params: Promise<{ id:
         setLoading(false);
       }
     };
-
     fetchResult();
   }, [id]);
 

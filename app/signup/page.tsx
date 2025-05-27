@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -15,27 +16,21 @@ export default function SignupPage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    console.log('Submitting signup form:', { email, password });
     const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
-    console.log('Received response from /api/auth/register:', res.status);
     const data = await res.json();
     if (!res.ok) {
-      console.error('Signup error:', data.error);
       setError(data.error || 'Signup failed');
       return;
     }
-    // Auto sign in after registration
-    console.log('Signup successful, signing in...');
     const loginRes = await signIn('credentials', { email, password, redirect: false });
     if (loginRes?.error) {
       setError('Auto-login failed');
       return;
     }
-    // If signup+login successful, check for unsaved quiz result
     if (typeof window !== 'undefined') {
       const local = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (local) {
@@ -54,13 +49,28 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
-      <div className="w-full max-w-md py-12 px-4">
-        <h1 className="text-2xl font-bold mb-6" style={{ color: '#0058C0' }}>Sign Up</h1>
+    <div className="min-h-screen flex bg-white">
+      {/* Left Side */}
+      <div className="flex flex-col justify-center w-3/5 max-w-md mx-auto px-6 py-12">
+        <h1 className="text-2xl font-bold mb-2 text-[#0058C0] text-center">Welcome to Dolphin Finance</h1>
+        <p className="mb-6 text-gray-700 text-center">Save your results, track progress over time, unlock peer comparison feature.</p>
+        <button
+          type="button"
+          onClick={() => signIn('google')}
+          className="w-full flex items-center justify-center px-4 py-2 rounded-full bg-white border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition mb-4"
+        >
+          <img src="/assets/Google G logo.png" alt="Google" className="w-5 h-5 mr-2" />
+          Continue with Google
+        </button>
+        <div className="flex items-center my-4">
+          <div className="flex-grow h-px bg-gray-200" />
+          <span className="mx-2 text-gray-400 text-sm">Or</span>
+          <div className="flex-grow h-px bg-gray-200" />
+        </div>
         <form onSubmit={handleSignup} className="space-y-4">
           <input
             type="email"
-            placeholder="Email"
+            placeholder="name@company.com"
             value={email}
             onChange={e => setEmail(e.target.value)}
             className="w-full px-4 py-2 border border-[#0058C0] rounded bg-white text-[#0058C0] placeholder-[#0058C0] focus:outline-none focus:ring-2 focus:ring-[#0058C0]"
@@ -75,12 +85,23 @@ export default function SignupPage() {
             required
           />
           {error && <div className="text-red-500 text-sm">{error}</div>}
-          <button type="submit" className="w-full px-4 py-2 rounded bg-[#0058C0] text-white font-semibold hover:bg-[#004494] transition">Sign Up</button>
+          <button type="submit" className="w-full px-4 py-2 rounded-full bg-[#0058C0] text-white font-semibold hover:opacity-90 transition duration-150 active:scale-95 active:opacity-80">Continue</button>
         </form>
-        <div className="mt-6 text-center">
-          <span style={{ color: '#0058C0' }}>Already have an account? </span>
-          <Link href="/login" className="text-[#0058C0] hover:underline font-semibold">Sign in</Link>
+        <div className="mt-4 text-xs text-gray-500 text-center">
+          By proceeding, you agree to the{' '}
+          <Link href="/terms" className="text-[#0058C0] hover:underline">Terms of Service</Link> and{' '}
+          <Link href="/privacy" className="text-[#0058C0] hover:underline">Privacy Policy</Link>.
         </div>
+        <div className="mt-6 text-center">
+          <span className="text-[#0058C0]">Already have an account? </span>
+          <Link href="/login" className="text-[#0058C0] hover:underline font-semibold">Log in</Link>
+        </div>
+      </div>
+      {/* Right Side */}
+      <div className="hidden md:flex flex-col items-center justify-center w-2/5 p-8" style={{ background: 'radial-gradient(circle at 60% 40%, #6EC6FF 0%, #1976D2 60%, #0058C0 100%)', fontFamily: 'Poppins, sans-serif' }}>
+        <div className="text-white text-3xl font-extrabold mb-8 text-center" style={{ fontFamily: 'Poppins, sans-serif' }}>🚀 Mobile app coming soon!</div>
+        <Image src="/assets/WIP DolphinFinance App in iPhone BACKGROUND REMOVED.png" alt="Mobile App Preview" width={300} height={600} className="mb-8" />
+        <div className="text-white text-xl text-center font-semibold" style={{ fontFamily: 'Poppins, sans-serif' }}>Track your finances on the go</div>
       </div>
     </div>
   );

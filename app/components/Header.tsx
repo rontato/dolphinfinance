@@ -21,8 +21,9 @@ export default function Header() {
   return (
     <header className="w-full bg-white shadow flex items-center justify-between px-6 py-3">
       <div className="flex items-center space-x-2">
-        <Link href="/" onClick={() => { window.location.href = '/'; }}>
-          <Image src="/assets/Logo + Logo Text.png" alt="Logo" width={160} height={40} style={{ objectFit: 'contain' }} />
+        <Link href="/" className="flex items-center space-x-1" style={{ textDecoration: 'none', alignItems: 'center' }} onClick={() => { window.location.href = '/'; }}>
+          <Image src="/assets/NEW_DolphinFinance_Logo_NO_BACKGROUND.png" alt="Logo" width={48} height={48} style={{ objectFit: 'contain' }} />
+          <Image src="/assets/Logo_Text.png" alt="Dolphin Finance" width={120} height={40} style={{ objectFit: 'contain' }} />
         </Link>
       </div>
       <div className="flex items-center space-x-4">
@@ -53,9 +54,12 @@ export default function Header() {
             </div>
           </>
         ) : (
-          <Link href="/login">
-            <button className="px-4 py-2 rounded bg-[#0058C0] text-white font-semibold hover:bg-blue-700 transition">Sign In</button>
-          </Link>
+          <>
+            <Link href="/login" className="text-[#0058C0] font-semibold hover:underline">Sign In</Link>
+            <Link href="/signup">
+              <button className="px-4 py-2 rounded-full bg-[#0058C0] text-white font-semibold hover:opacity-90 transition duration-150 active:scale-95 active:opacity-80 ml-2">Sign Up</button>
+            </Link>
+          </>
         )}
       </div>
     </header>

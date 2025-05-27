@@ -58,7 +58,7 @@ const questions: Question[] = [
   {
     id: 1,
     section: "💵 Section 1: Income & Budgeting",
-    text: "Do you currently have a source of income?",
+    text: "Do you currently receive money from any source (job, internship, allowance, reimbursements, etc.)?",
     type: "multiple_choice",
     options: [
       { value: "yes", label: "Yes" },
@@ -68,7 +68,7 @@ const questions: Question[] = [
   {
     id: 2,
     section: "💵 Section 1: Income & Budgeting",
-    text: "What is your monthly income after taxes? (Include any money given/gifted to you)",
+    text: "What is your average monthly income? (Include any money given/gifted to you)",
     type: "slider",
     min: 0,
     max: 20000,
@@ -82,7 +82,7 @@ const questions: Question[] = [
   {
     id: 3,
     section: "💵 Section 1: Income & Budgeting",
-    text: "What are your total monthly expenses?",
+    text: "What is your average monthly spending? (Discluding any expenses paid for by others)",
     type: "slider",
     min: 0,
     max: 20000,
@@ -131,35 +131,6 @@ const questions: Question[] = [
   {
     id: 7,
     section: "🏦 Section 2: Banking & Accounts",
-    text: "Do you have a savings account?",
-    type: "multiple_choice",
-    options: [
-      { value: "yes", label: "Yes" },
-      { value: "no", label: "No" },
-      { value: "unknown", label: "I don't know what a savings account is" }
-    ]
-  },
-  {
-    id: 8,
-    section: "🏦 Section 2: Banking & Accounts",
-    text: "Which bank is your savings account with?",
-    type: "bank",
-    condition: { questionId: 7, expectedValue: "yes" }
-  },
-  {
-    id: 9,
-    section: "🏦 Section 2: Banking & Accounts",
-    text: "What's your typical savings account balance?",
-    type: "slider",
-    min: 0,
-    max: 100000,
-    step: 100,
-    prefix: "$",
-    condition: { questionId: 7, expectedValue: "yes" }
-  },
-  {
-    id: 10,
-    section: "🏦 Section 2: Banking & Accounts",
     text: "Do you have a high-yield savings account?",
     type: "multiple_choice",
     options: [
@@ -169,14 +140,14 @@ const questions: Question[] = [
     ]
   },
   {
-    id: 11,
+    id: 8,
     section: "🏦 Section 2: Banking & Accounts",
     text: "Which bank is your high-yield savings account with?",
     type: "bank",
-    condition: { questionId: 10, expectedValue: "yes" }
+    condition: { questionId: 7, expectedValue: "yes" }
   },
   {
-    id: 12,
+    id: 9,
     section: "🏦 Section 2: Banking & Accounts",
     text: "What's your typical high-yield savings account balance?",
     type: "slider",
@@ -184,7 +155,7 @@ const questions: Question[] = [
     max: 100000,
     step: 100,
     prefix: "$",
-    condition: { questionId: 10, expectedValue: "yes" }
+    condition: { questionId: 7, expectedValue: "yes" }
   },
   // Section 3: Debt Management
   {
@@ -536,7 +507,7 @@ export default function Quiz({ onShowResults }: QuizProps) {
     const renderBackButton = () => (
       <button
         onClick={handleBack}
-        className="w-1/4 px-3 py-1.5 bg-gray-200 text-[#0058C0] rounded-md hover:bg-gray-300"
+        className="w-1/4 px-3 py-1.5 bg-white text-blue-500 border-2 border-blue-400 rounded-full hover:bg-blue-50 transition duration-150 active:scale-95 active:opacity-80"
         disabled={questionHistory.length <= 1}
         style={{ visibility: currentQuestion === 0 ? 'hidden' : 'visible' }}
       >
@@ -547,7 +518,7 @@ export default function Quiz({ onShowResults }: QuizProps) {
     const renderNextButton = (onClick: () => void, disabled = false) => (
       <button
         onClick={onClick}
-        className="w-3/4 px-4 py-2 bg-[#0058C0] text-white rounded-md hover:bg-[#004494]"
+        className="w-3/4 px-4 py-2 bg-[#0058C0] text-white rounded-full hover:opacity-90 transition duration-150 active:scale-95 active:opacity-80"
         disabled={disabled}
       >
         Next
@@ -641,7 +612,7 @@ export default function Quiz({ onShowResults }: QuizProps) {
                 style={{ accentColor: '#0058C0' }}
               />
             </div>
-            <div className="text-center text-lg font-semibold text-[#0058C0]">
+            <div className="text-center text-lg font-semibold text-blue-gradient">
               {question.prefix || ''}
               {(() => {
                 const val = answers[question.id];
