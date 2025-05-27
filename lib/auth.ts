@@ -54,6 +54,10 @@ export const authOptions: NextAuthOptions = {
       // Only run for Google sign-in
       if (account?.provider === 'google') {
         // Find user by email
+        if (!user.email) {
+          // If email is missing, do not allow sign in
+          return false;
+        }
         const existingUser = await prisma.user.findUnique({ where: { email: user.email } });
         if (existingUser) {
           // Check if Google account is already linked
