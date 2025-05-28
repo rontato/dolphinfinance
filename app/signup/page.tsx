@@ -9,6 +9,7 @@ export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const LOCAL_STORAGE_KEY = 'unsaved_quiz_result';
@@ -16,6 +17,7 @@ export default function SignupPage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
     const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -24,11 +26,13 @@ export default function SignupPage() {
     const data = await res.json();
     if (!res.ok) {
       setError(data.error || 'Signup failed');
+      setLoading(false);
       return;
     }
     const loginRes = await signIn('credentials', { email, password, redirect: false });
     if (loginRes?.error) {
       setError('Auto-login failed');
+      setLoading(false);
       return;
     }
     if (typeof window !== 'undefined') {
@@ -42,9 +46,14 @@ export default function SignupPage() {
             body: JSON.stringify(quizData),
           });
           localStorage.removeItem(LOCAL_STORAGE_KEY);
-        } catch {}
+        } catch (err) {
+          setError('Failed to save quiz result. Please try again.');
+          setLoading(false);
+          return;
+        }
       }
     }
+    setLoading(false);
     router.push('/history');
   };
 
@@ -85,6 +94,7 @@ export default function SignupPage() {
             required
           />
           {error && <div className="text-red-500 text-sm">{error}</div>}
+          {loading && <div className="text-blue-500 text-sm">Saving your quiz result...</div>}
           <button type="submit" className="w-full px-4 py-2 rounded-full bg-[#0058C0] text-white font-semibold hover:opacity-90 transition duration-150 active:scale-95 active:opacity-80">Continue</button>
         </form>
         <div className="mt-4 text-xs text-gray-500 text-center">

@@ -9,6 +9,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const LOCAL_STORAGE_KEY = 'unsaved_quiz_result';
@@ -16,6 +17,7 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
     const res = await signIn('credentials', {
       email,
       password,
@@ -23,6 +25,7 @@ export default function LoginPage() {
     });
     if (res?.error) {
       setError('Invalid email or password');
+      setLoading(false);
       return;
     }
     // If login successful, check for unsaved quiz result
@@ -37,9 +40,14 @@ export default function LoginPage() {
             body: JSON.stringify(quizData),
           });
           localStorage.removeItem(LOCAL_STORAGE_KEY);
-        } catch {}
+        } catch (err) {
+          setError('Failed to save quiz result. Please try again.');
+          setLoading(false);
+          return;
+        }
       }
     }
+    setLoading(false);
     router.push('/history');
   };
 
@@ -71,6 +79,7 @@ export default function LoginPage() {
               <button type="button" className="text-[#0058C0] text-sm font-semibold hover:underline">Forgot password?</button>
             </div>
             {error && <div className="text-red-500 text-sm">{error}</div>}
+            {loading && <div className="text-blue-500 text-sm">Saving your quiz result...</div>}
             <button type="submit" className="w-full px-4 py-2 rounded-full bg-[#0058C0] text-white font-semibold hover:opacity-90 transition duration-150 active:scale-95 active:opacity-80">Sign in</button>
           </form>
           <div className="flex items-center my-4">

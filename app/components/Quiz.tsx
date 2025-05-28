@@ -345,6 +345,7 @@ const questions: Question[] = [
       { value: "index_funds", label: "Index funds" },
       { value: "bonds", label: "Bonds" },
       { value: "options", label: "Stock options" },
+      { value: "crypto", label: "Crypto" },
       { value: "other", label: "Other" }
     ],
     condition: { questionId: 26, expectedValue: "yes" }
@@ -389,6 +390,7 @@ const questions: Question[] = [
       { value: "index_funds", label: "Index funds" },
       { value: "bonds", label: "Bonds" },
       { value: "options", label: "Stock options" },
+      { value: "crypto", label: "Crypto" },
       { value: "other", label: "Other" }
     ],
     condition: { questionId: 30, expectedValue: "yes" }
@@ -595,6 +597,11 @@ export default function Quiz({ onShowResults }: QuizProps) {
                   setSliderValue(val);
                   setAnswers(prev => ({ ...prev, [question.id]: val }));
                 }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    handleAnswer(typeof answers[question.id] === 'number' ? answers[question.id] : sliderValue);
+                  }
+                }}
                 className="w-32 px-2 py-1 border border-[#0058C0] rounded-md text-right font-semibold text-[#0058C0] bg-white placeholder-[#0058C0]"
               />
               <input
@@ -644,6 +651,20 @@ export default function Quiz({ onShowResults }: QuizProps) {
               onChange={(e) => {
                 logInput(e);
                 setTextInput(e.target.value);
+              }}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  if (question.id === 3.5) {
+                    const age = Number(textInput);
+                    if (isNaN(age) || age < 18 || age > 100) {
+                      alert("Please enter a valid age between 18 and 100");
+                      return;
+                    }
+                    handleAnswer(age);
+                  } else {
+                    handleAnswer(textInput);
+                  }
+                }
               }}
               className="w-full px-3 py-2 border rounded-md text-gray-900 font-medium bg-white focus:ring-2 focus:ring-[#0058C0] focus:border-[#0058C0] placeholder:text-gray-400"
               placeholder={question.id === 3.5 ? "Enter your age (18-100)" : "Enter your answer"}
