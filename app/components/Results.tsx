@@ -51,39 +51,39 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
     let score = 0;
     const details: string[] = [];
 
-    // Income Presence (5 points)
+    // Income Presence (3 points)
     if (answers[1] === 'yes') {
-      score += 5;
-      details.push('✓ Has income (+5 points)');
+      score += 3;
+      details.push('✓ Has income (+3 points)');
     } else {
       details.push('✗ No income (+0 points)');
     }
 
-    // Income-to-Spending Ratio (10 points)
+    // Income-to-Spending Ratio (15 points, scaled)
     const monthlyIncome = Number(answers[2]) || 0;
     const monthlySpending = Number(answers[3]) || 0;
 
     if (monthlyIncome > 0) {
       const spendingRatio = monthlySpending / monthlyIncome;
-      if (spendingRatio <= 0.5) {
-        score += 10;
-        details.push('✓ Excellent spending ratio - ≤50% of income (+10 points)');
-      } else if (spendingRatio <= 0.7) {
-        score += 7;
-        details.push('✓ Good spending ratio - 51-70% of income (+7 points)');
+      if (spendingRatio <= 0.7) {
+        score += 15;
+        details.push('✓ Excellent spending ratio - You\'re saving at least 30% of your income! (+15 points)');
       } else if (spendingRatio <= 0.9) {
-        score += 4;
-        details.push('⚠ High spending ratio - 71-90% of income (+4 points)');
+        score += 10;
+        details.push('✓ Good spending ratio - You\'re saving at least 10% of your income! (+10 points)');
+      } else if (spendingRatio <= 1.1) {
+        score += 7;
+        details.push('⚠ High spending ratio - You\'re living paycheck to paycheck (+7 points)');
       } else {
-        score += 1;
-        details.push('✗ Very high spending ratio - >90% of income (+1 point)');
+        score += 0;
+        details.push('✗ Very high spending ratio - You\'re spending more money than you make! (+0 point)');
       }
     }
 
     return {
       section: "Income & Budgeting",
       score,
-      maxScore: 15,
+      maxScore: 18,
       details
     };
   };
@@ -92,26 +92,42 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
     let score = 0;
     const details: string[] = [];
 
-    // Checking Account (5 points)
+    // Checking Account (8 points)
     if (answers[4] === 'yes') {
-      score += 5;
-      details.push('✓ Has checking account (+5 points)');
+      score += 8;
+      details.push('✓ Has checking account (+8 points)');
     } else {
       details.push('✗ No checking account (+0 points)');
     }
 
-    // High-Yield Savings Account (10 points)
+    // High-Yield Savings Account (9 points)
     if (answers[7] === 'yes') {
-      score += 10;
-      details.push('✓ Has high-yield savings account (+10 points)');
+      score += 9;
+      details.push('✓ Has high-yield savings account (+9 points)');
     } else {
       details.push('✗ No high-yield savings account (+0 points)');
+    }
+
+    // Checking Account Balance (up to 4 points)
+    const checkingBalance = Number(answers[6]) || 0;
+    const monthlySpending = Number(answers[3]) || 0;
+    if (checkingBalance > 2 * monthlySpending && monthlySpending > 0) {
+      score += 4;
+      details.push('✓ Checking account balance is more than 2x your monthly spending (+4 points)');
+    } else if (checkingBalance > monthlySpending && monthlySpending > 0) {
+      score += 2;
+      details.push('✓ Checking account balance is higher than your monthly spending (+2 points)');
+    } else if (checkingBalance > 0) {
+      score += 1;
+      details.push('✓ Has a positive checking account balance (+1 point)');
+    } else {
+      details.push('✗ No checking account balance (+0 points)');
     }
 
     return {
       section: "Banking & Accounts",
       score,
-      maxScore: 15,
+      maxScore: 21,
       details
     };
   };
@@ -132,37 +148,37 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
       (carLoanDebt * 0.025) +    // ~2.5% of car loan balance
       (creditCardDebt * 0.035); // ~3.5% of credit card balance
 
-    // Debt-to-Income Ratio (10 points)
+    // Debt-to-Income Ratio (5 points)
     if (monthlyIncome > 0) {
       const dti = monthlyDebtPayment / monthlyIncome;
       if (dti === 0) {
-        score += 10;
-        details.push('✓ No debt (DTI: 0%) (+10 points)');
+        score += 5;
+        details.push('✓ No debt (DTI: 0%) (+5 points)');
       } else if (dti <= 0.15) {
-        score += 8;
-        details.push('✓ Low debt-to-income ratio (DTI: 1-15%) (+8 points)');
+        score += 4;
+        details.push('✓ Low debt-to-income ratio (DTI: 1-15%) (+4 points)');
       } else if (dti <= 0.30) {
-        score += 6;
-        details.push('✓ Moderate debt-to-income ratio (DTI: 16-30%) (+6 points)');
-      } else if (dti <= 0.45) {
         score += 3;
-        details.push('⚠ High debt-to-income ratio (DTI: 31-45%) (+3 points)');
+        details.push('✓ Moderate debt-to-income ratio (DTI: 16-30%) (+3 points)');
+      } else if (dti <= 0.45) {
+        score += 2;
+        details.push('⚠ High debt-to-income ratio (DTI: 31-45%) (+2 points)');
       } else {
         details.push('✗ Very high debt-to-income ratio (DTI: >45%) (+0 points)');
       }
     }
 
-    // Debt Diversification & Type (10 points, rebalance)
+    // Debt Diversification & Type (5 points, rebalance)
     const hasStudentLoan = answers[13] === 'yes';
     const hasCarLoan = answers[15] === 'yes';
     const hasCreditCardDebt = answers[19] === 'yes';
 
     if (!hasStudentLoan && !hasCarLoan && !hasCreditCardDebt) {
-      score += 10;
-      details.push('✓ No debt (+10 points)');
+      score += 5;
+      details.push('✓ No debt (+5 points)');
     } else if ((hasStudentLoan || hasCarLoan) && !hasCreditCardDebt) {
-      score += 7;
-      details.push('✓ Only manageable debt (+7 points)');
+      score += 3;
+      details.push('✓ Only manageable debt (+3 points)');
     } else if (hasCreditCardDebt) {
       score += 2;
       details.push('⚠ Has high-interest debt (+2 points)');
@@ -171,7 +187,7 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
     return {
       section: "Debt Management",
       score,
-      maxScore: 20,
+      maxScore: 10,
       details
     };
   };
@@ -180,11 +196,11 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
     let score = 0;
     const details: string[] = [];
 
-    // Credit Score (10 points)
+    // Credit Score (11 points)
     const creditScore = answers[25] as string;
     if (creditScore === 'excellent') {
-      score += 10;
-      details.push('✓ Excellent credit score: 800+ (+10 points)');
+      score += 11;
+      details.push('✓ Excellent credit score: 800+ (+11 points)');
     } else if (creditScore === 'very_good') {
       score += 8;
       details.push('✓ Very good credit score: 740-799 (+8 points)');
@@ -201,22 +217,28 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
       details.push('✗ Unknown credit score (+0 points)');
     }
 
-    // Number of Credit Cards (5 points)
+    // Number of Credit Cards (6 points max)
     const creditCards = answers[24] as string;
-    if (creditCards === 'multiple') {
-      score += 5;
-      details.push('✓ Has multiple credit cards (+5 points)');
+    if (creditCards === 'none' || creditCards === 'unknown') {
+      details.push('✗ No credit cards (+0 points)');
     } else if (creditCards === 'one') {
       score += 3;
       details.push('✓ Has one credit card (+3 points)');
-    } else {
-      details.push('✗ No credit cards (+0 points)');
+    } else if (creditCards === 'two') {
+      score += 4;
+      details.push('✓ Has two credit cards (+4 points)');
+    } else if (creditCards === 'three') {
+      score += 5;
+      details.push('✓ Has three credit cards (+5 points)');
+    } else if (creditCards === 'four_plus') {
+      score += 6;
+      details.push('✓ Has four or more credit cards (+6 points)');
     }
 
     return {
       section: "Credit Score",
       score,
-      maxScore: 15,
+      maxScore: 17,
       details
     };
   };
@@ -233,11 +255,11 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
       details.push('✗ No brokerage account (+0 points)');
     }
 
-    // Investment Diversity (5 points)
+    // Investment Diversity (6 points)
     const investmentTypes = Array.isArray(answers[29]) ? answers[29] : [];
     if (investmentTypes.length > 1) {
-      score += 5;
-      details.push('✓ Diversified investments (+5 points)');
+      score += 6;
+      details.push('✓ Diversified investments (+6 points)');
     } else if (investmentTypes.length === 1) {
       score += 3;
       details.push('⚠ Single investment type (+3 points)');
@@ -245,11 +267,11 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
       details.push('✗ No investments (+0 points)');
     }
 
-    // Investment Amount (5 points)
+    // Investment Amount (6 points)
     const investmentAmount = Number(answers[28]) || 0;
     if (investmentAmount > 0) {
-      score += 5;
-      details.push('✓ Has investments (+5 points)');
+      score += 6;
+      details.push('✓ Has investments (+6 points)');
     } else {
       details.push('✗ No investment amount (+0 points)');
     }
@@ -257,7 +279,7 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
     return {
       section: "Investing",
       score,
-      maxScore: 15,
+      maxScore: 17,
       details
     };
   };
@@ -266,39 +288,33 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
     let score = 0;
     const details: string[] = [];
 
-    // Roth IRA (5 points)
+    // Roth IRA (7 points)
     if (answers[30] === 'yes') {
-      score += 5;
-      details.push('✓ Has Roth IRA (+5 points)');
+      score += 7;
+      details.push('✓ Has Roth IRA (+7 points)');
     } else {
       details.push('✗ No Roth IRA (+0 points)');
     }
 
-    // 401(k) (5 points)
-    if (answers[34] === 'yes') {
-      score += 5;
-      details.push('✓ Has 401(k) (+5 points)');
-    } else {
-      details.push('✗ No 401(k) (+0 points)');
-    }
-
-    // Retirement Savings Amount (10 points)
+    // Retirement Savings Amount (10 points, diminishing returns)
     const rothAmount = Number(answers[32]) || 0;
-    const k401Amount = Number(answers[35]) || 0;
-    const totalRetirement = rothAmount + k401Amount;
+    const totalRetirement = rothAmount;
 
     if (totalRetirement >= 25000) {
       score += 10;
       details.push('✓ Excellent retirement savings (+10 points)');
     } else if (totalRetirement >= 17500) {
+      score += 9;
+      details.push('✓ Very strong retirement savings (+9 points)');
+    } else if (totalRetirement >= 10000) {
+      score += 8;
+      details.push('✓ Strong retirement savings (+8 points)');
+    } else if (totalRetirement >= 5000) {
       score += 7;
       details.push('✓ Good retirement savings (+7 points)');
-    } else if (totalRetirement >= 10000) {
-      score += 5;
-      details.push('⚠ Moderate retirement savings (+5 points)');
     } else if (totalRetirement > 0) {
-      score += 2;
-      details.push('⚠ Low retirement savings (+2 points)');
+      score += 5;
+      details.push('✓ Has some retirement savings (+5 points)');
     } else {
       details.push('✗ No retirement savings (+0 points)');
     }
@@ -306,7 +322,7 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
     return {
       section: "Retirement",
       score,
-      maxScore: 20,
+      maxScore: 17,
       details
     };
   };

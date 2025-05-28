@@ -12,8 +12,8 @@ export const metadata: Metadata = {
   title: "Dolphin Finance",
   description: "Discover your financial health score and get personalized recommendations to improve your financial well-being.",
   icons: {
-    icon: '/assets/Dolphin Finance Logo Icon.ico',
-    apple: '/assets/Dolphin Finance Logo Icon.ico',
+    icon: '/assets/DolphinFinanice Logo Icon Favicon Icon.ico',
+    apple: '/assets/DolphinFinanice Logo Icon Favicon Icon.ico',
   },
   manifest: '/manifest.json',
   themeColor: '#0058C0',
@@ -24,6 +24,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="scroll-smooth">
+      <head>
+        <link rel="icon" href="/assets/DolphinFinanice Logo Icon Favicon Icon.ico" type="image/x-icon" />
+      </head>
       <body 
         className={inter.className} 
         style={{ background: '#fff', color: '#000' }}

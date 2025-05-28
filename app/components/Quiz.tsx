@@ -383,7 +383,7 @@ const questions: Question[] = [
   {
     id: 33,
     section: "🏦 Section 6: Long-Term Savings & Retirement",
-    text: "What are you invested in? (Select all that apply)",
+    text: "What are you invested in with your Roth IRA? (Select all that apply)",
     type: "multi_select",
     options: [
       { value: "stocks", label: "Individual stocks" },
