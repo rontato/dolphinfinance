@@ -5,6 +5,7 @@ import Header from './components/Header';
 import ClientLayout from './components/ClientLayout';
 import ConditionalHeaderLayout from './components/ConditionalHeaderLayout';
 import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       >
         <ConditionalHeaderLayout>{children}</ConditionalHeaderLayout>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
