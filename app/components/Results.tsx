@@ -16,6 +16,12 @@ interface ScoreBreakdown {
   details: string[];
 }
 
+interface PercentileData {
+  groupSize: number;
+  totalPercentile?: number;
+  categoryPercentiles?: Record<string, number>;
+}
+
 const LOCAL_STORAGE_KEY = 'unsaved_quiz_result';
 
 // Use browser-compatible hash function
@@ -33,6 +39,9 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
   const [signingIn, setSigningIn] = useState(false);
   const [error, setError] = useState("");
   const [resultHash, setResultHash] = useState<string | null>(null);
+  const [percentileData, setPercentileData] = useState<PercentileData | null>(null);
+  const [percentileLoading, setPercentileLoading] = useState(false);
+  const [percentileError, setPercentileError] = useState("");
   // Comment out email-related state
   // const [email, setEmail] = useState('');
   // const [isSubmitting, setIsSubmitting] = useState(false);
@@ -326,185 +335,23 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
 
   const { totalScore, maxScore, percentage, breakdowns } = calculateTotalScore();
 
-  // --- Percentile Breakdown Feature (Commented Out) ---
-  /*
-  const calculatePercentileInputs = () => {
-    // Calculate total debt
-    const studentLoanDebt = Number(answers[14]) || 0;
-    const carLoanDebt = Number(answers[16]) || 0;
-    const mortgageDebt = Number(answers[18]) || 0;
-    const creditCardDebt = Number(answers[20]) || 0;
-    const otherDebt = Number(answers[23]) || 0;
-    const totalDebt = studentLoanDebt + carLoanDebt + mortgageDebt + creditCardDebt + otherDebt;
-
-    // Calculate total savings
-    const checkingBalance = Number(answers[6]) || 0;
-    const savingsBalance = Number(answers[9]) || 0;
-    const hysaBalance = Number(answers[12]) || 0;
-    const totalSavings = checkingBalance + savingsBalance + hysaBalance;
-
-    // Get investment and retirement balances
-    const investmentBalance = Number(answers[28]) || 0;
-    const rothBalance = Number(answers[32]) || 0;
-    const k401Balance = Number(answers[35]) || 0;
-    const retirementSavings = rothBalance + k401Balance;
-
-    return {
-      age: 30, // TODO: Add age question to quiz
-      monthlyIncome: Number(answers[2]) || 0,
-      monthlySpending: Number(answers[3]) || 0,
-      creditScore: answers[25] as string || 'unknown',
-      totalDebt,
-      totalSavings,
-      investmentBalance,
-      retirementSavings
-    };
-  };
-
-  const percentileData = calculatePercentiles(calculatePercentileInputs());
-
-  const renderPercentileSection = () => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.2 }}
-      className="bg-white rounded-lg shadow-lg p-6 mb-8"
-    >
-      <h3 className="text-2xl font-bold text-gray-900 mb-6">How You Compare to Your Peers</h3>
-      <div className="space-y-6">
-        <div className="text-center">
-          <div className="text-4xl font-bold mb-2" style={{ color: '#0058C0' }}>
-            {percentileData.finalPercentile}th Percentile
-          </div>
-          <div className="text-xl text-gray-600">
-            {getPercentileDescription(percentileData.finalPercentile)}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-4">
-            <div className="relative pt-1">
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <span className="text-sm font-semibold text-gray-700">Income</span>
-                </div>
-                <div className="text-right">
-                  <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
-                    {percentileData.incomePercentile}th Percentile
-                  </span>
-                </div>
-              </div>
-              <div className="overflow-hidden h-2 bg-gray-200 rounded">
-                <div
-                  className="h-full rounded"
-                  style={{ width: `${percentileData.incomePercentile}%`, backgroundColor: '#0058C0' }}
-                />
-              </div>
-            </div>
-
-            <div className="relative pt-1">
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <span className="text-sm font-semibold text-gray-700">Spending</span>
-                </div>
-                <div className="text-right">
-                  <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
-                    {percentileData.spendingPercentile}th Percentile
-                  </span>
-                </div>
-              </div>
-              <div className="overflow-hidden h-2 bg-gray-200 rounded">
-                <div
-                  className="h-full rounded"
-                  style={{ width: `${percentileData.spendingPercentile}%`, backgroundColor: '#0058C0' }}
-                />
-              </div>
-            </div>
-
-            <div className="relative pt-1">
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <span className="text-sm font-semibold text-gray-700">Debt Management</span>
-                </div>
-                <div className="text-right">
-                  <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
-                    {percentileData.debtPercentile}th Percentile
-                  </span>
-                </div>
-              </div>
-              <div className="overflow-hidden h-2 bg-gray-200 rounded">
-                <div
-                  className="h-full rounded"
-                  style={{ width: `${percentileData.debtPercentile}%`, backgroundColor: '#0058C0' }}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="relative pt-1">
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <span className="text-sm font-semibold text-gray-700">Credit Score</span>
-                </div>
-                <div className="text-right">
-                  <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
-                    {percentileData.creditScorePercentile}th Percentile
-                  </span>
-                </div>
-              </div>
-              <div className="overflow-hidden h-2 bg-gray-200 rounded">
-                <div
-                  className="h-full rounded"
-                  style={{ width: `${percentileData.creditScorePercentile}%`, backgroundColor: '#0058C0' }}
-                />
-              </div>
-            </div>
-
-            <div className="relative pt-1">
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <span className="text-sm font-semibold text-gray-700">Savings</span>
-                </div>
-                <div className="text-right">
-                  <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
-                    {percentileData.savingsPercentile}th Percentile
-                  </span>
-                </div>
-              </div>
-              <div className="overflow-hidden h-2 bg-gray-200 rounded">
-                <div
-                  className="h-full rounded"
-                  style={{ width: `${percentileData.savingsPercentile}%`, backgroundColor: '#0058C0' }}
-                />
-              </div>
-            </div>
-
-            <div className="relative pt-1">
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <span className="text-sm font-semibold text-gray-700">Investments</span>
-                </div>
-                <div className="text-right">
-                  <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
-                    {percentileData.investmentPercentile}th Percentile
-                  </span>
-                </div>
-              </div>
-              <div className="overflow-hidden h-2 bg-gray-200 rounded">
-                <div
-                  className="h-full rounded"
-                  style={{ width: `${percentileData.investmentPercentile}%`, backgroundColor: '#0058C0' }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-  */
-  // --- End Percentile Breakdown Feature ---
+  // Fetch percentiles if logged in
+  useEffect(() => {
+    const age = answers[3.5];
+    if (session && age && typeof age === 'number') {
+      setPercentileLoading(true);
+      setPercentileError("");
+      fetch('/api/quiz/percentiles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ age, score: totalScore, breakdowns }),
+      })
+        .then(res => res.json())
+        .then(data => setPercentileData(data))
+        .catch(err => setPercentileError('Failed to load percentiles'))
+        .finally(() => setPercentileLoading(false));
+    }
+  }, [session, answers, totalScore, breakdowns]);
 
   useEffect(() => {
     hashAnswers(answers).then(setResultHash);
@@ -628,142 +475,53 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
           </div>
         </div>
 
-        {/* Percentile Comparison (Commented Out) */}
-        {/**
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <h3 className="text-2xl font-semibold text-[#0058C0] mb-4">How You Compare to Your Peers</h3>
-          <div className="space-y-6">
-            <div className="text-center">
-              <div className="text-4xl font-bold mb-2" style={{ color: '#0058C0' }}>
-                {percentileData.finalPercentile}th Percentile
-              </div>
-              <div className="text-xl text-gray-600">
-                {getPercentileDescription(percentileData.finalPercentile)}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-4">
-                <div className="relative pt-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <span className="text-sm font-semibold text-gray-700">Income</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
-                        {percentileData.incomePercentile}th Percentile
-                      </span>
-                    </div>
+        {/* Percentile Comparison (Live) */}
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-8 flex flex-col items-center justify-center">
+          <div className="text-center w-full">
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">How do you compare?</h3>
+            <p className="text-base text-gray-600 mb-4">See how your financial health stacks up against other students your age.</p>
+            {!session && (
+              <Link href="/login">
+                <button
+                  className="inline-block bg-[#0058C0] text-white px-6 py-2 rounded-full font-semibold hover:opacity-90 transition duration-150 active:scale-95 active:opacity-80 mt-2"
+                >
+                  Sign in to unlock this feature
+                </button>
+              </Link>
+            )}
+            {session && percentileLoading && <p className="text-gray-500">Loading percentile data...</p>}
+            {session && percentileError && <p className="text-red-500">{percentileError}</p>}
+            {session && percentileData && (
+              percentileData.groupSize < 100 ? (
+                <>
+                  <p className="text-lg text-gray-600 mb-2">Percentile results are coming soon!</p>
+                  <p className="text-sm text-gray-400 mb-4">{`Only ${percentileData.groupSize} result${percentileData.groupSize === 1 ? '' : 's'} in your age group so far.`}</p>
+                </>
+              ) : (
+                <>
+                  <div className="mb-4">
+                    <div className="text-4xl font-bold mb-2 text-[#0058C0]">{percentileData.totalPercentile}th Percentile</div>
+                    <div className="text-xl text-gray-600 mb-2">Overall</div>
                   </div>
-                  <div className="overflow-hidden h-2 bg-gray-200 rounded">
-                    <div
-                      className="h-full rounded"
-                      style={{ width: `${percentileData.incomePercentile}%`, backgroundColor: '#0058C0' }}
-                    />
+                  <div className="w-full max-w-xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {percentileData.categoryPercentiles && Object.entries(percentileData.categoryPercentiles).map(([section, pct]) => (
+                      <div key={section} className="mb-2">
+                        <div className="flex justify-between mb-1">
+                          <span className="font-semibold text-gray-700">{section}</span>
+                          <span className="font-semibold text-[#0058C0]">{pct}th</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-[#0058C0] h-2 rounded-full" style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </div>
-
-                <div className="relative pt-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <span className="text-sm font-semibold text-gray-700">Spending</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
-                        {percentileData.spendingPercentile}th Percentile
-                      </span>
-                    </div>
-                  </div>
-                  <div className="overflow-hidden h-2 bg-gray-200 rounded">
-                    <div
-                      className="h-full rounded"
-                      style={{ width: `${percentileData.spendingPercentile}%`, backgroundColor: '#0058C0' }}
-                    />
-                  </div>
-                </div>
-
-                <div className="relative pt-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <span className="text-sm font-semibold text-gray-700">Debt Management</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
-                        {percentileData.debtPercentile}th Percentile
-                      </span>
-                    </div>
-                  </div>
-                  <div className="overflow-hidden h-2 bg-gray-200 rounded">
-                    <div
-                      className="h-full rounded"
-                      style={{ width: `${percentileData.debtPercentile}%`, backgroundColor: '#0058C0' }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="relative pt-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <span className="text-sm font-semibold text-gray-700">Credit Score</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
-                        {percentileData.creditScorePercentile}th Percentile
-                      </span>
-                    </div>
-                  </div>
-                  <div className="overflow-hidden h-2 bg-gray-200 rounded">
-                    <div
-                      className="h-full rounded"
-                      style={{ width: `${percentileData.creditScorePercentile}%`, backgroundColor: '#0058C0' }}
-                    />
-                  </div>
-                </div>
-
-                <div className="relative pt-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <span className="text-sm font-semibold text-gray-700">Savings</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
-                        {percentileData.savingsPercentile}th Percentile
-                      </span>
-                    </div>
-                  </div>
-                  <div className="overflow-hidden h-2 bg-gray-200 rounded">
-                    <div
-                      className="h-full rounded"
-                      style={{ width: `${percentileData.savingsPercentile}%`, backgroundColor: '#0058C0' }}
-                    />
-                  </div>
-                </div>
-
-                <div className="relative pt-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <span className="text-sm font-semibold text-gray-700">Investments</span>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-sm font-semibold" style={{ color: '#0058C0' }}>
-                        {percentileData.investmentPercentile}th Percentile
-                      </span>
-                    </div>
-                  </div>
-                  <div className="overflow-hidden h-2 bg-gray-200 rounded">
-                    <div
-                      className="h-full rounded"
-                      style={{ width: `${percentileData.investmentPercentile}%`, backgroundColor: '#0058C0' }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+                  <p className="text-xs text-gray-400 mt-4">Based on {percentileData.groupSize} results in your age group.</p>
+                </>
+              )
+            )}
           </div>
         </div>
-        */}
 
         {/* Score Breakdown (Dropdown) */}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-8">

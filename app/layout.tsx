@@ -12,8 +12,8 @@ export const metadata: Metadata = {
   title: "Dolphin Finance",
   description: "Discover your financial health score and get personalized recommendations to improve your financial well-being.",
   icons: {
-    icon: '/assets/DolphinFinance Logo.png',
-    apple: '/assets/DolphinFinance Logo.png',
+    icon: '/assets/NEW_DolphinFinance_Logo_NO_BACKGROUND.png',
+    apple: '/assets/NEW_DolphinFinance_Logo_NO_BACKGROUND.png',
   },
   manifest: '/manifest.json',
   themeColor: '#0058C0',

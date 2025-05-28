@@ -57,7 +57,7 @@ export default function Header() {
           <>
             <Link href="/login" className="text-[#0058C0] font-semibold hover:underline">Sign In</Link>
             <Link href="/signup">
-              <button className="px-4 py-2 rounded-full bg-[#0058C0] text-white font-semibold hover:opacity-90 transition duration-150 active:scale-95 active:opacity-80 ml-2">Sign Up</button>
+              <button className="px-4 py-2 rounded-full bg-blue-gradient text-white font-semibold hover:opacity-90 transition duration-150 active:scale-95 active:opacity-80 ml-2">Sign Up</button>
             </Link>
           </>
         )}
