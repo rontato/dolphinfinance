@@ -19,7 +19,7 @@ export default function Home() {
               <span className="block text-blue-gradient-home">Dive into your Finances</span>
             </h1>
             <p className="mt-0 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-0 md:text-xl md:max-w-3xl">
-              College finances are confusing. Find out exactly where you stand in just 2 minutes! 💸
+              The 2-min quiz helping college students master money with personalized financial insights. 📊✨
             </p>
           </div>
         </div>

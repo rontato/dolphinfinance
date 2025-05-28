@@ -406,29 +406,29 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
           console.log('Duplicate check result:', checkData);
           if (!checkData.exists) {
             console.log('Saving quiz result to API:', payload);
-            const res = await fetch('/api/quiz/save', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+          const res = await fetch('/api/quiz/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(payload),
-            });
-            if (!res.ok) {
-              const data = await res.json();
+      });
+          if (!res.ok) {
+            const data = await res.json();
               console.error('Save failed:', data);
-              throw new Error(data.error || 'Failed to save results');
+            throw new Error(data.error || 'Failed to save results');
             }
             console.log('Quiz result saved successfully');
           } else {
             console.log('Quiz result already exists, not saving');
           }
-          setSaved(true);
+      setSaved(true);
           localStorage.removeItem(LOCAL_STORAGE_KEY);
         } catch (err: any) {
           setError(err.message || 'Failed to save results');
           console.error('Save error:', err);
-        } finally {
+    } finally {
           setSigningIn(false);
-        }
-      };
+    }
+  };
       if (local) {
         let quizData;
         try {
@@ -525,11 +525,11 @@ const Results: React.FC<ResultsProps> = ({ answers }) => {
                         <div className="flex justify-between mb-1">
                           <span className="font-semibold text-gray-700">{section}</span>
                           <span className="font-semibold text-[#0058C0]">{pct}th</span>
-                        </div>
+                  </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div className="bg-[#0058C0] h-2 rounded-full" style={{ width: `${pct}%` }} />
-                        </div>
-                      </div>
+                    </div>
+                  </div>
                     ))}
                   </div>
                   <p className="text-xs text-gray-400 mt-4">Based on {percentileData.groupSize} results in your age group.</p>

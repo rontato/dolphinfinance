@@ -23,7 +23,7 @@ export default function Header() {
       <div className="flex items-center space-x-2">
         <Link href="/" className="flex items-center space-x-1" style={{ textDecoration: 'none', alignItems: 'center' }} onClick={() => { window.location.href = '/'; }}>
           <Image src="/assets/NEW_DolphinFinance_Logo_NO_BACKGROUND.png" alt="Logo" width={36} height={36} style={{ objectFit: 'contain' }} />
-          <Image src="/assets/Logo_Text.png" alt="Dolphin Finance" width={120} height={40} style={{ objectFit: 'contain' }} />
+          <Image src="/assets/Logo Text.svg" alt="Dolphin Finance" width={120} height={40} style={{ objectFit: 'contain' }} />
         </Link>
       </div>
       <div className="flex items-center space-x-4">

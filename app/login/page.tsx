@@ -52,7 +52,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f3f6f8]">
+    <div className="min-h-screen flex flex-col bg-white">
+      {/* Logo combo in top left */}
+      <div className="absolute top-6 left-6 z-10">
+        <Link href="/" className="flex items-center gap-2">
+          <Image src="/assets/NEW_DolphinFinance_Logo_NO_BACKGROUND.png" alt="Dolphin Logo" width={36} height={36} className="cursor-pointer" />
+          <Image src="/assets/Logo Text.svg" alt="Dolphin Finance" width={120} height={40} className="cursor-pointer" />
+        </Link>
+      </div>
       <div className="flex flex-col items-center justify-center flex-1">
         <div className="w-full max-w-sm bg-white rounded-xl shadow-lg p-8 mx-2">
           <div className="flex justify-center mb-6">

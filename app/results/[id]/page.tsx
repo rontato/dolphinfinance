@@ -462,7 +462,7 @@ export default function QuizResultPage() {
                       <h3 className="text-lg font-semibold text-gray-900">{breakdown.section}</h3>
                       <div className="text-right">
                         <span className="text-lg font-bold text-gray-900">{breakdown.score}/{breakdown.maxScore}</span>
-                      </div>
+                    </div>
                     </div>
                     <div className="space-y-2">
                       {breakdown.details.map((detail, index) => (

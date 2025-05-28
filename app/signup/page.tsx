@@ -60,7 +60,13 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen flex bg-white">
       {/* Left Side */}
-      <div className="flex flex-col justify-center w-3/5 max-w-md mx-auto px-6 py-12">
+      <div className="flex flex-col justify-center w-3/5 max-w-md mx-auto px-6 py-12 relative" style={{ minHeight: '100vh' }}>
+        {/* Dolphin Logo above heading */}
+        <div className="flex justify-center mb-8">
+          <Link href="/">
+            <Image src="/assets/NEW_DolphinFinance_Logo_NO_BACKGROUND.png" alt="Dolphin Logo" width={80} height={80} className="cursor-pointer" />
+          </Link>
+        </div>
         <h1 className="text-2xl font-bold mb-2 text-[#0058C0] text-center">Welcome to Dolphin Finance</h1>
         <p className="mb-6 text-gray-700 text-center">Save your results, track progress over time, unlock peer comparison feature.</p>
         <button
@@ -98,9 +104,7 @@ export default function SignupPage() {
           <button type="submit" className="w-full px-4 py-2 rounded-full bg-[#0058C0] text-white font-semibold hover:opacity-90 transition duration-150 active:scale-95 active:opacity-80">Continue</button>
         </form>
         <div className="mt-4 text-xs text-gray-500 text-center">
-          By proceeding, you agree to the{' '}
-          <Link href="/terms" className="text-[#0058C0] hover:underline">Terms of Service</Link> and{' '}
-          <Link href="/privacy" className="text-[#0058C0] hover:underline">Privacy Policy</Link>.
+          <span className="text-black font-medium">By signing up, you'll be automatically added to our mobile app waitlist!</span>
         </div>
         <div className="mt-6 text-center">
           <span className="text-[#0058C0]">Already have an account? </span>
@@ -111,7 +115,9 @@ export default function SignupPage() {
       <div className="hidden md:flex flex-col items-center justify-center w-2/5 p-8" style={{ background: 'radial-gradient(circle at 60% 40%, #6EC6FF 0%, #1976D2 60%, #0058C0 100%)', fontFamily: 'Poppins, sans-serif' }}>
         <div className="text-white text-3xl font-extrabold mb-8 text-center" style={{ fontFamily: 'Poppins, sans-serif' }}>🚀 Mobile app coming soon!</div>
         <Image src="/assets/WIP DolphinFinance App in iPhone BACKGROUND REMOVED.png" alt="Mobile App Preview" width={300} height={600} className="mb-8" />
-        <div className="text-white text-xl text-center font-semibold" style={{ fontFamily: 'Poppins, sans-serif' }}>Track your finances on the go</div>
+        <div className="text-white text-xl text-center font-semibold flex flex-col items-center gap-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          Dive even deeper into your personal finances
+        </div>
       </div>
     </div>
   );
