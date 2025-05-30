@@ -430,7 +430,7 @@ export default function QuizResultPage() {
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-4xl font-bold text-gray-900">{scorePercentage}%</span>
+                  <span className="text-4xl font-bold text-gray-900">{Math.round(scorePercentage)}%</span>
                 </div>
               </div>
             </div>
@@ -482,7 +482,7 @@ export default function QuizResultPage() {
               {recommendations.map((rec) => (
                 <div key={rec.title} className="bg-gray-50 rounded-lg p-6">
                   <h3 className="text-xl font-semibold text-[#0058C0] mb-4">{rec.title}</h3>
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4">
                     {rec.products?.map((product) => (
                       <div key={product.name} className="bg-white rounded-lg p-4 shadow-sm">
                         <h4 className="font-semibold text-gray-900 mb-2">{product.name}</h4>

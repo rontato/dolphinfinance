@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(req: NextRequest, context: any) {
   console.log('GET /api/quiz/result/[id] hit with params:', context.params);
-  const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions);
   console.log('Session:', session);
   if (!session?.user?.email) {
     console.log('Unauthorized: No session or email');

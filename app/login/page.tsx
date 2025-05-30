@@ -65,30 +65,30 @@ export default function LoginPage() {
           <div className="flex justify-center mb-6">
             <span className="text-2xl font-bold text-[#0058C0]">Sign in</span>
           </div>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <input
-              type="email"
+        <form onSubmit={handleLogin} className="space-y-4">
+          <input
+            type="email"
               placeholder="Email or Phone"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
+            value={email}
+            onChange={e => setEmail(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0058C0]"
-              required
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0058C0]"
-              required
-            />
+            required
+          />
             <div className="flex justify-end">
               <button type="button" className="text-[#0058C0] text-sm font-semibold hover:underline">Forgot password?</button>
             </div>
-            {error && <div className="text-red-500 text-sm">{error}</div>}
+          {error && <div className="text-red-500 text-sm">{error}</div>}
             {loading && <div className="text-blue-500 text-sm">Saving your quiz result...</div>}
             <button type="submit" className="w-full px-4 py-2 rounded-full bg-[#0058C0] text-white font-semibold hover:opacity-90 transition duration-150 active:scale-95 active:opacity-80">Sign in</button>
-          </form>
+        </form>
           <div className="flex items-center my-4">
             <div className="flex-grow h-px bg-gray-200" />
             <span className="mx-2 text-gray-400 text-sm">or</span>

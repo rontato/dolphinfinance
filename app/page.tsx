@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Quiz from './components/Quiz';
@@ -9,11 +9,22 @@ export default function Home() {
   const [showQuiz, setShowQuiz] = useState(false);
   const [showResults, setShowResults] = useState(false);
 
+  useEffect(() => {
+    if (!showQuiz && !showResults) {
+      document.body.classList.add('overflow-hidden', 'h-screen');
+    } else {
+      document.body.classList.remove('overflow-hidden', 'h-screen');
+    }
+    return () => {
+      document.body.classList.remove('overflow-hidden', 'h-screen');
+    };
+  }, [showQuiz, showResults]);
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-gray-100">
       {/* Hero Section */}
       {!showResults && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
           <div className="text-center">
             <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl mb-4 leading-[1.1]">
               <span className="block text-blue-gradient-home">Dive into your Finances</span>
@@ -74,6 +85,20 @@ export default function Home() {
           )}
         </div>
       </div>
+      {/* Credibility / Social Proof Section */}
+      {!showQuiz && !showResults && (
+        <div className="w-full flex flex-col items-center justify-center mt-16">
+          <img
+            src="/assets/Anthropic Logo.png"
+            alt="Anthropic Logo"
+            className="h-7 w-auto mb-1"
+            style={{ filter: 'grayscale(1) brightness(0.5) invert(0.3) opacity(0.85)' }}
+          />
+          <div className="text-center">
+            <div className="text-sm font-semibold text-gray-400">Backed by the Anthropic Student Builders</div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

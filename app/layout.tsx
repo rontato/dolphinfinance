@@ -6,6 +6,7 @@ import ClientLayout from './components/ClientLayout';
 import ConditionalHeaderLayout from './components/ConditionalHeaderLayout';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { usePathname } from 'next/navigation';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,13 +24,19 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // Use client-side hook to get the current path
+  // Only allow scrolling on /results/[id] and not on / or quiz pages
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+  const isResultsPage = pathname.startsWith('/results/');
+  const noScroll = !isResultsPage;
+
   return (
     <html lang="en" className="scroll-smooth">
       <head>
         <link rel="icon" href="/assets/DolphinFinanice Logo Icon Favicon Icon.ico" type="image/x-icon" />
       </head>
       <body 
-        className={inter.className} 
+        className={inter.className}
         style={{ background: '#fff', color: '#000' }}
         suppressHydrationWarning={true}
       >
